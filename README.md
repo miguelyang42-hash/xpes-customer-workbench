@@ -25,6 +25,15 @@ A neutral, model-agnostic workspace for customer development and follow-up opera
 - Explicit manual completion; completion never implies an email or message was sent.
 - Task list filters and completion history.
 
+## P3 — Customer nurturing and multi-touch follow-up (approved design)
+- Dedicated Customer Nurturing Center with due-for-review, engagement, active-sequence, paused/nurture and analytics views.
+- Initial outreach plus follow-ups 2–4, with a separate bounded long-term nurture path.
+- Every follow-up requires human review and explicit approval; AI only recommends timing and drafts content.
+- AI timing uses recipient-local working hours, verified timezone confidence, engagement-event quality and contact history, subject to cooldown, frequency and suppression rules.
+- Open tracking is an unverified signal unless a reliable explicit read receipt exists; opens never prove human reading or purchase intent.
+- Replies, hard bounces, opt-outs, complaints and manual takeover pause/stop the relevant sequence.
+- Full specification: `docs/customer-nurturing-follow-up-engine.md`.
+
 ## Current preview limitations
 - New customer and task entries are currently saved only in this browser's local storage.
 - Demo customer rows are illustrative and are not real leads.
