@@ -35,6 +35,21 @@ A task has:
 
 Marking a reminder complete is a manual user action only. It does not mean an email was sent, a WhatsApp message was delivered, a customer was contacted or an external task succeeded.
 
+## P3 — Customer nurturing and multi-touch follow-up
+
+The approved next product-design module is a dedicated Customer Nurturing Center. It manages the initial outreach plus follow-ups 2–4 and, when separately authorized, a bounded long-term nurture plan.
+
+Confirmed user decisions:
+- Every follow-up message requires human review and explicit approval before sending.
+- AI recommends recipient-local timing using local working hours, engagement-event confidence and the contact's interaction history.
+- AI may create drafts and reminders, but it does not autonomously send follow-ups.
+- Open tracking is not proof of a human read; proxy/prefetch events are marked unverified.
+- Replies, hard bounces, opt-outs, complaints and manual takeover pause or stop the relevant contact-level sequence.
+- Company, contact, endpoint and opportunity lifecycles remain separate. A reply from one contact must not cause blind outreach to another employee.
+- Every draft, approval, send attempt and provider event must be auditable. AI self-report is never execution evidence.
+
+Detailed requirements and acceptance tests: `docs/customer-nurturing-follow-up-engine.md`.
+
 ## Safety and data ownership
 
 - Every business table is workspace-scoped and protected by Row Level Security.
