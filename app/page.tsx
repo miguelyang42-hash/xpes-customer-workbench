@@ -254,6 +254,25 @@ const translations: Record<string, string> = {
   "Execution audit": "执行审计",
   "Demo reply copied. No email has been sent.": "已复制演示回复，没有发送邮件。",
   "Connect the live database before creating tasks.": "请先连接真实数据库，再创建跟进任务。",
+  "Plan builder will be connected to the task engine in the next build stage.": "开发计划编辑器将在下一阶段接入任务引擎。",
+  "Needs attention": "需要处理",
+  "Today": "今天",
+  "Follow-up task": "客户跟进",
+  "Not specified": "未指定",
+  "Not provided": "未提供",
+  "Not identified": "未识别",
+  "Source verified": "来源已核实",
+  "Unverified": "未核实",
+  "Not available": "不可用",
+  "Research": "调研中",
+  "Distributor": "经销商",
+  "Importer / wholesaler": "进口商 / 批发商",
+  "Manufacturer": "制造商",
+  "Service provider": "服务商",
+  "End user": "终端用户",
+  "Other": "其他",
+  "All countries": "所有国家",
+  "All products": "所有产品",
   "Today's Action Center": "今日行动中心",
   "Today": "今天",
   "Overdue": "已逾期",
@@ -411,7 +430,7 @@ export default function Home() {
               const Icon = item.icon;
               return <button key={item.id} className={"nav-item " + (active === item.id ? "active" : "")} onClick={() => { setActive(item.id); setMobileMenu(false); }}>
                 <Icon size={17}/><span>{t(item.label)}</span>
-                {item.id === "inbox" && <span className="nav-count">2</span>}
+                {item.id === "tasks" && tasks.filter(task=>task.status==="open").length>0 && <span className="nav-count">{tasks.filter(task=>task.status==="open").length}</span>}
               </button>;
             })}
           </div>)}
@@ -477,7 +496,7 @@ export default function Home() {
 
           {active === "mail" && <section><div className="page-heading"><div><div className="eyebrow">EMAIL OPERATIONS</div><h1>{t("AI Mail Manager")}</h1><p>{t("Separate AI prospecting mail from your everyday business inbox.")}</p></div><span className="stage-tag">{t("Mailbox not connected")}</span></div><div className="mail-tabs">{["All","Sent","Replies","Bounces","Unsubscribed","Auto-replies","Priority"].map(tab=><button key={tab} className={mailTab===tab?"mail-tab active-mail-tab":"mail-tab"} onClick={()=>setMailTab(tab)}>{t(tab)}</button>)}</div><div className="mail-empty"><div className="empty-icon"><Inbox size={25}/></div><h3>{mailTab==="All"?"Your AI mail workspace is ready":mailTab+" folder"}</h3><p>Connect Gmail or Tencent Enterprise Mail to synchronize real messages, delivery events and replies. Nothing will be moved or sent before you approve the connection and rules.</p><button className="secondary-button" onClick={()=>showNotice("Mailbox connection is scheduled for the integration stage. No account has been accessed.")}>View connection requirements <ArrowRight size={15}/></button></div></section>}
 
-          {active === "tasks" && <TaskCenter tasks={tasks} customers={allCustomers} onCreate={()=>openTaskModal(null)} onComplete={completeTask} t={t}/>}
+          {active === "tasks" && <TaskCenter tasks={tasks} onCreate={()=>openTaskModal(null)} onComplete={completeTask} t={t}/>}
 
           {active === "models" && <section><div className="page-heading"><div><div className="eyebrow">MODEL-AGNOSTIC ARCHITECTURE</div><h1>{t("Model Connections")}</h1><p>{t("Choose providers independently of the business workflow.")}</p></div><button className="primary-button" onClick={()=>showNotice("Model connection setup will request your provider endpoint and API key through encrypted settings. Do not paste keys into chat.")}><Plus size={16}/> Add provider</button></div><div className="model-grid">{[{name:"OpenAI-compatible API",desc:"Custom endpoint · model name · encrypted key",tag:"Provider adapter"},{name:"DeepSeek",desc:"Optional model provider",tag:"Provider adapter"},{name:"Google Gemini",desc:"Optional model provider",tag:"Provider adapter"},{name:"Anthropic Claude",desc:"Optional model provider",tag:"Provider adapter"}].map(m=><div className="model-card" key={m.name}><div className="model-symbol"><Bot size={20}/></div><div><h3>{m.name}</h3><p>{m.desc}</p><span className="stage-tag">{m.tag}</span></div><button className="secondary-button compact" onClick={()=>showNotice("No model provider is connected yet.")}>Configure</button></div>)}</div><div className="notice-card"><ShieldCheck size={19}/><div><strong>{t("Credential safety")}</strong><p>{t("API keys will be stored server-side as encrypted secrets. They will never be exposed in browser code or chat messages.")}</p></div></div></section>}
 
@@ -526,7 +545,7 @@ function TodayActionList({tasks,onComplete,onCreateTask,t}:{tasks:FollowUpTask[]
   return <div className="today-task-list">{due.map(task=><div className="today-task-row" key={task.id}><button className="task-check" aria-label={t("Mark complete")} onClick={()=>onComplete(task.id)}><CheckCircle2 size={18}/></button><div className="today-task-copy"><strong>{task.title}</strong><span>{task.customerName || t("No customer linked")} · {task.description || t("This is a manual reminder. It does not send a message or claim external work was completed.")}</span></div><div className="today-task-meta"><span className={"task-priority "+task.priority}>{t(task.priority[0].toUpperCase()+task.priority.slice(1))}</span><small>{task.dueDate<todayLocal()?t("Overdue"):t("Today")}</small></div></div>)}</div>;
 }
 
-function TaskCenter({tasks,customers,onCreate,onComplete,t}:{tasks:FollowUpTask[];customers:Customer[];onCreate:()=>void;onComplete:(id:string)=>void;t:(value:string)=>string}) {
+function TaskCenter({tasks,onCreate,onComplete,t}:{tasks:FollowUpTask[];onCreate:()=>void;onComplete:(id:string)=>void;t:(value:string)=>string}) {
   const [filter,setFilter]=useState("open");
   const visible=tasks.filter(x=>filter==="all" || (filter==="open" && x.status==="open") || (filter==="completed" && x.status==="completed"));
   const overdue=tasks.filter(x=>x.status==="open" && x.dueDate<todayLocal()).length;
