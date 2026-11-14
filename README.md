@@ -1,24 +1,44 @@
 # AI Sales Workspace
 
-Independent V1.0 workspace for customer development.
+A neutral, model-agnostic workspace for customer development and follow-up operations.
 
 ## Product principles
-- Model-agnostic: providers are adapters, not workflow dependencies.
-- Evidence-first: a task is not complete because an AI model says it is complete.
-- Customer-first: company identity, contacts, opportunities and channel events are separate records.
-- Human-controlled social outreach: prepare verified links and drafts; do not automate prohibited platform actions.
-- Safe email operations: explicit account authorization, send evidence, bounce classification, suppression and audit history.
-- Buyer-perspective review: critique outbound messages from the recipient's role and business incentives.
+- No company-specific branding; language can be changed independently.
+- Customer-first data model: companies, contacts, contact methods, opportunities and interactions are separate records.
+- Evidence-first execution: a task is not complete because an AI model says it is complete.
+- Human-controlled outreach: prepare verified links and drafts; do not automate prohibited platform actions.
+- Multi-account, multi-channel architecture: channel accounts are separate from customer identity; secrets are stored outside the database.
+- Privacy by default: personal chat accounts are not silently imported; every channel requires explicit authorization.
 
-## Current build status
-The first deployment is a front-end preview with clearly labeled demonstration records. It does not connect to live customer data, AI providers, Gmail, Tencent Enterprise Mail or social platforms. No real outreach is sent.
+## P1 — Customer foundation
+- Company/account records, multiple contacts per company, multiple contact methods per person.
+- Contact source, verification status, hard-bounce and suppression tracking.
+- Separate opportunities and product associations.
+- Channel-neutral interaction history with external message IDs for deduplication.
+- Workspace-level tenant isolation and Row Level Security.
+- Migration: `supabase/migrations/202611140001_customer_and_followup_foundation.sql`.
+
+## P2 — Daily action and follow-up
+- Today's Action Center with due and overdue reminders.
+- Create customer records and follow-up tasks.
+- Link tasks to a customer; set due date and priority.
+- Explicit manual completion; completion never implies an email or message was sent.
+- Task list filters and completion history.
+
+## Current preview limitations
+- New customer and task entries are currently saved only in this browser's local storage.
+- Demo customer rows are illustrative and are not real leads.
+- Cloud database, authentication, team permissions, AI providers, mailboxes and messaging channels are not connected yet.
+- Do not use browser-local preview data as the sole business record.
+- No real outreach is sent from this preview.
 
 ## Planned architecture
 - Next.js frontend
-- PostgreSQL/Supabase backend (new isolated project to be provisioned after billing/region confirmation)
+- PostgreSQL/Supabase backend with authenticated workspace membership and RLS
 - Persistent task queue and independent workers
 - Provider-neutral AI adapter
-- Gmail API and Tencent Enterprise Mail IMAP/SMTP connectors
+- Gmail API and Tencent Enterprise Mail connectors
+- Official WhatsApp Business API / eligible coexistence accounts; personal WhatsApp remains manual-assist unless an official supported path becomes available
 - Evidence ledger, idempotency, suppression list and retry/reconciliation rules
 
 ## Local development
@@ -26,4 +46,4 @@ The first deployment is a front-end preview with clearly labeled demonstration r
 - npm run dev
 - npm run build
 
-Never commit API keys, OAuth tokens, mailbox passwords or production customer data.
+Never commit API keys, OAuth tokens, mailbox passwords, private chat exports or production customer data.
