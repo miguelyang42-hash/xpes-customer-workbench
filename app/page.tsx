@@ -207,7 +207,24 @@ const translations: Record<string, string> = {
   "Contact information": "联系信息",
   "Next best action": "下一步最佳行动",
   "Identity and role require source verification": "身份和职位仍需核实来源",
-  "Recommendation only · not an executed task": "仅为建议 · 尚未执行任务"
+  "Recommendation only · not an executed task": "仅为建议 · 尚未执行任务",
+  "AI Workspace": "AI 工作空间",
+  "LIVE DATA PENDING": "等待真实数据",
+  "All stages": "所有阶段",
+  "Research": "调研中",
+  "Verification": "核实中",
+  "Ready for review": "待审核",
+  "Awaiting reply": "等待回复",
+  "Technical inquiry": "技术询盘",
+  "Do not contact": "禁止联系",
+  "All products": "所有产品",
+  "Workspace preview": "工作空间预览",
+  "V1.0 PREVIEW": "V1.0 预览",
+  "AI Sales Workspace · Independent environment": "AI Sales Workspace · 独立环境",
+  "Independent environment": "独立环境",
+  "Exportable customer records, task history and audit trail": "客户档案、任务历史和审计记录均可导出",
+  "No unverified contact auto-send; no false completion states": "未经核实的联系人不得自动发送；不得虚报任务完成",
+  "Automated database backups and restore drills": "自动数据库备份与恢复演练"
 };
 type Language = "en" | "zh";
 
@@ -225,7 +242,7 @@ export default function Home() {
   const [notice, setNotice] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
   const [mailTab, setMailTab] = useState("All");
-  const [draft, setDraft] = useState("Hi Alex,\n\nI noticed your company offers outdoor pest-control products. Would adding a private-label solar mosquito killer help expand your current range?\n\nWe can share a short comparison of suitable configurations for your market. Would that be useful?\n\nBest regards,\nXPES Team");
+  const [draft, setDraft] = useState("Hi Alex,\n\nI noticed your company offers outdoor pest-control products. Would adding a private-label solar mosquito killer help expand your current range?\n\nWe can share a short comparison of suitable configurations for your market. Would that be useful?\n\nBest regards,\nSales Team");
 
   const filtered = useMemo(() => customers.filter(c => {
     const text = [c.company, c.country, c.product, c.type, c.contact, c.email].join(" ").toLowerCase();
@@ -290,8 +307,8 @@ export default function Home() {
               <div className="search-box"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Search company, country, product, contact…")}/></div>
               <select value={country} onChange={e=>setCountry(e.target.value)}><option>{t("All countries")}</option>{Array.from(new Set(customers.map(c=>c.country))).sort().map(c=><option key={c}>{c}</option>)}</select>
               <select value={product} onChange={e=>setProduct(e.target.value)}><option>{t("All products")}</option>{Array.from(new Set(customers.map(c=>c.product))).map(p=><option key={p}>{p}</option>)}</select>
-              <select value={stage} onChange={e=>setStage(e.target.value)}>{stageOptions.map(s=><option key={s}>{s}</option>)}</select>
-              <button className="secondary-button compact" onClick={()=>{setQuery("");setCountry("All countries");setProduct("All products");setStage("All stages");}}><RefreshCw size={15}/> Reset</button>
+              <select value={stage} onChange={e=>setStage(e.target.value)}>{stageOptions.map(s=><option key={s}>{t(s)}</option>)}</select>
+              <button className="secondary-button compact" onClick={()=>{setQuery("");setCountry("All countries");setProduct("All products");setStage("All stages");}}><RefreshCw size={15}/> {t("Reset")}</button>
             </div>
             <div className="table-card">
               <div className="table-toolbar"><div><strong>{filtered.length} {t("accounts")}</strong><span> · {t("Click a row to view the full profile")}</span></div><button className="ghost-button" onClick={()=>showNotice("Export will be enabled when the customer database is connected.")}><Download size={15}/> Export</button></div>
@@ -342,10 +359,10 @@ function Overview({ onNavigate, onNotice, t }: { onNavigate: (id:string)=>void; 
     <div className="preview-banner"><div className="preview-icon"><Sparkles size={18}/></div><div><strong>{t("Independent workspace initialized")}</strong><p>{t("This is the first UI build. Demo records are clearly marked; real database, AI models and mailboxes are not connected yet.")}</p></div><span className="preview-status">{t("PREVIEW")}</span></div>
     <div className="section-title"><div><h2>{t("Business pulse")}</h2><p>{t("Production metrics will appear after verified data is connected.")}</p></div><button className="ghost-button" onClick={()=>onNotice(t("These are placeholders, not live operating figures."))}>{t("Why no live metrics?")}</button></div>
     <div className="metric-grid">
-      <Metric icon={<Building2 size={17}/>} label={t("Verified new accounts")} value="—" hint={t("Requires live research + deduplication")}/>
-      <Metric icon={<Send size={17}/>} label={t("Qualified outreach")} value="—" hint={t("Requires external send evidence")}/>
-      <Metric icon={<MessageCircle size={17}/>} label={t("Meaningful replies")} value="—" hint={t("Excludes auto-replies and bounces")}/>
-      <Metric icon={<Target size={17}/>} label={t("Active opportunities")} value="—" hint={t("Requires real commercial progress")}/>
+      <Metric icon={<Building2 size={17}/>} label={t("Verified new accounts")} value="—" hint={t("Requires live research + deduplication")} t={t}/>
+      <Metric icon={<Send size={17}/>} label={t("Qualified outreach")} value="—" hint={t("Requires external send evidence")} t={t}/>
+      <Metric icon={<MessageCircle size={17}/>} label={t("Meaningful replies")} value="—" hint={t("Excludes auto-replies and bounces")} t={t}/>
+      <Metric icon={<Target size={17}/>} label={t("Active opportunities")} value="—" hint={t("Requires real commercial progress")} t={t}/>
     </div>
     <div className="dashboard-grid">
       <div className="panel priority-panel"><div className="panel-heading"><div><h2>{t("Priority queue")}</h2><p>{t("Suggested work · sample records")}</p></div><span className="soft-count">03</span></div>
@@ -361,8 +378,8 @@ function Overview({ onNavigate, onNotice, t }: { onNavigate: (id:string)=>void; 
     <div className="quick-grid">{[{id:"plans",icon:<Target size={18}/>,title:"Development plans",desc:"Product, market, buyer profile and target"},{id:"customers",icon:<Users size={18}/>,title:"Customer assets",desc:"Search, filter, deduplicate and expand profiles"},{id:"inbox",icon:<MessageCircle size={18}/>,title:"Conversation hub",desc:"Buyer context, AI suggestions and human review"},{id:"tasks",icon:<ShieldCheck size={18}/>,title:"Execution audit",desc:"Real evidence, failures and safe recovery"}].map(x=><button className="quick-card" key={x.id} onClick={()=>onNavigate(x.id)}><span>{x.icon}</span><strong>{x.title}</strong><small>{x.desc}</small><ArrowUpRight size={15}/></button>)}</div>
   </section>;
 }
-function Metric({icon,label,value,hint}:{icon:React.ReactNode;label:string;value:string;hint:string}) {
-  return <div className="metric-card"><div className="metric-top"><span className="metric-icon">{icon}</span><span className="metric-period">LIVE DATA PENDING</span></div><strong>{value}</strong><span className="metric-label">{label}</span><small>{hint}</small></div>;
+function Metric({icon,label,value,hint,t}:{icon:React.ReactNode;label:string;value:string;hint:string;t:(value:string)=>string}) {
+  return <div className="metric-card"><div className="metric-top"><span className="metric-icon">{icon}</span><span className="metric-period">{t("LIVE DATA PENDING")}</span></div><strong>{value}</strong><span className="metric-label">{label}</span><small>{hint}</small></div>;
 }
 function CustomerDrawer({customer,onClose,t}:{customer:Customer;onClose:()=>void;t:(value:string)=>string}) {
   return <div className="drawer-backdrop" onClick={onClose}><aside className="customer-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-top"><div><div className="eyebrow">{t("CUSTOMER PROFILE")}</div><h2>{customer.company}</h2><p>{customer.country} · {customer.type}</p></div><button className="icon-button" onClick={onClose}><X size={18}/></button></div><div className="drawer-summary"><Sparkles size={16}/><div><strong>{t("AI business summary")}</strong><p>{customer.summary}</p></div></div><div className="drawer-section"><h3>{t("Business snapshot")}</h3><div className="detail-grid"><div><span>Product fit</span><strong>{customer.product}</strong></div><div><span>Customer grade</span><strong>{customer.grade} · evidence pending</strong></div><div><span>Development stage</span><strong>{customer.stage}</strong></div><div><span>Last updated</span><strong>{customer.updated}</strong></div></div></div><div className="drawer-section"><h3>{t("Contact information")}</h3><div className="contact-record"><Mail size={16}/><div><strong>{customer.email}</strong><span>{customer.emailStatus}</span></div></div><div className="contact-record"><Users size={16}/><div><strong>{customer.contact}</strong><span>{t("Identity and role require source verification")}</span></div></div></div><div className="drawer-section"><h3>{t("Next best action")}</h3><div className="next-action-card"><Target size={17}/><div><strong>{customer.next}</strong><span>{t("Recommendation only · not an executed task")}</span></div></div></div><div className="drawer-actions"><button className="secondary-button" onClick={()=>navigator.clipboard?.writeText(customer.company)}>{t("Copy company name")}</button><button className="primary-button" onClick={()=>alert("Connect the live database before creating tasks.")}>{t("Create follow-up task")}</button></div></aside></div>;
