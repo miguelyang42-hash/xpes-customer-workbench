@@ -33,7 +33,8 @@ const navGroups = [
     { id: "overview", label: "Command Center", icon: Compass },
     { id: "plans", label: "Development Plans", icon: Target },
     { id: "customers", label: "Customer Database", icon: Building2 },
-    { id: "inbox", label: "Conversation Hub", icon: MessageCircle }
+    { id: "inbox", label: "Conversation Hub", icon: MessageCircle },
+    { id: "nurturing", label: "Customer Nurturing", icon: RefreshCw }
   ]},
   { label: "EXECUTION", items: [
     { id: "outreach", label: "Outreach Center", icon: Send },
@@ -481,13 +482,18 @@ export default function Home() {
           </section>}
 
           {active === "plans" && <section>
-            <div className="page-heading"><div><div className="eyebrow">{t("AUTONOMOUS WORKFLOWS")}</div><h1>{t("Development Plans")}</h1><p>{t("Define a market, product and buyer profile before execution.")}</p></div><button className="primary-button" onClick={()=>showNotice(t("Plan builder will be connected to the task engine in the next build stage."))}><Plus size={16}/> {t("New plan")}</button></div>
+            <div className="page-heading"><div><div className="eyebrow">{t("AUTONOMOUS WORKFLOWS")}</div><h1>{t("Development Plans")}</h1><p>{t("Define a market, product and buyer profile before execution.")}</p></div><button className="primary-button" onClick={()=>showNotice(t("Plan builder is a design preview. No live search or external task has started."))}><Plus size={16}/> {t("New plan")}</button></div>
+            <div className="launch-control-card"><div className="launch-control-copy"><span className="eyebrow">{t("CONTROLLED EXECUTION")}</span><h2>{t("Start a verified development run")}</h2><p>{t("Review target scope, provider readiness, search limits and approval gates before creating an execution batch.")}</p><div className="launch-checks"><span><ShieldCheck size={15}/> {t("Evidence-based completion")}</span><span><Users size={15}/> {t("Deduplication before counting")}</span><span><Mail size={15}/> {t("Human approval before every email")}</span></div></div><button className="primary-button launch-main-button" onClick={()=>onNavigate("run-preflight")}><Zap size={17}/> {t("Prepare development run")}</button></div>
             <div className="plan-grid">
               <div className="plan-card featured-plan"><div className="plan-card-top"><span className="plan-icon"><Target size={18}/></span><span className="stage-tag stage-green">{t("Draft template")}</span></div><h3>{t("Solar Mosquito Killer · South America")}</h3><p>Find local brands, importers and outdoor pest-control distributors.</p><div className="plan-meta"><span><Globe2 size={14}/> Peru · Chile · Brazil</span><span><Users size={14}/> {t("Brand / distributor")}</span></div><div className="plan-bottom"><span>{t("Not started")}</span><button className="text-button" onClick={()=>showNotice("This is a planning template. No search has been started.")}>{t("Configure")} <ArrowRight size={14}/></button></div></div>
               <div className="plan-card"><div className="plan-card-top"><span className="plan-icon"><Layers3 size={18}/></span><span className="stage-tag">{t("Draft template")}</span></div><h3>{t("185nm TOC Replacement Lamps")}</h3><p>Identify ultrapure-water system owners, service companies and replacement channels.</p><div className="plan-meta"><span><Globe2 size={14}/> North America · Taiwan · SEA</span><span><Users size={14}/> {t("Service / integrator")}</span></div><div className="plan-bottom"><span>Not started</span><button className="text-button" onClick={()=>showNotice("This is a planning template. No search has been started.")}>Configure <ArrowRight size={14}/></button></div></div>
               <div className="plan-card"><div className="plan-card-top"><span className="plan-icon"><Zap size={18}/></span><span className="stage-tag">Draft template</span></div><h3>{t("Industrial UV Water Disinfection")}</h3><p>Find water-treatment engineering firms, OEM partners and project integrators.</p><div className="plan-meta"><span><Globe2 size={14}/> Global</span><span><Users size={14}/> {t("Engineering / OEM")}</span></div><div className="plan-bottom"><span>Not started</span><button className="text-button" onClick={()=>showNotice("This is a planning template. No search has been started.")}>Configure <ArrowRight size={14}/></button></div></div>
             </div>
           </section>}
+
+          {active === "run-preflight" && <RunPreflight t={t} onBack={()=>setActive("plans")} onNotice={showNotice}/>}
+          {active === "nurturing" && <NurturingCenter t={t} onNotice={showNotice}/>}
+
 
           {active === "inbox" && <section>
             <div className="page-heading"><div><div className="eyebrow">CUSTOMER RELATIONSHIPS</div><h1>{t("Conversation Hub")}</h1><p>{t("One place for customer replies, context and reviewed AI suggestions.")}</p></div><span className="stage-tag">{t("Demo conversations")}</span></div>
@@ -517,7 +523,7 @@ export default function Home() {
 
 function Overview({ onNavigate, onNotice, t, tasks, customersCount, onCreateTask, onCompleteTask }: { onNavigate: (id:string)=>void; onNotice: (message:string)=>void; t: (value:string)=>string; tasks: FollowUpTask[]; customersCount:number; onCreateTask:()=>void; onCompleteTask:(id:string)=>void }) {
   return <section>
-    <div className="welcome-row"><div><div className="eyebrow">{t("SATURDAY · NOVEMBER 14, 2026")}</div><h1>{t("Good morning")}</h1><p>{t("Your sales development command center is ready.")}</p></div><button className="primary-button" onClick={()=>onNavigate("plans")}><Plus size={16}/> {t("Create development plan")}</button></div>
+    <div className="welcome-row"><div><div className="eyebrow">{t("SATURDAY · NOVEMBER 14, 2026")}</div><h1>{t("Good morning")}</h1><p>{t("Your sales development command center is ready.")}</p></div><div className="overview-actions"><button className="secondary-button" onClick={()=>onNavigate("plans")}><Plus size={16}/> {t("Create development plan")}</button><button className="primary-button" onClick={()=>onNavigate("run-preflight")}><Zap size={16}/> {t("Start development")}</button></div></div>
     <div className="preview-banner"><div className="preview-icon"><Sparkles size={18}/></div><div><strong>{t("Independent workspace initialized")}</strong><p>{t("This is the first UI build. Demo records are clearly marked; real database, AI models and mailboxes are not connected yet.")}</p></div><span className="preview-status">{t("PREVIEW")}</span></div>
     <div className="section-title"><div><h2>{t("Business pulse")}</h2><p>{t("Production metrics will appear after verified data is connected.")}</p></div><button className="ghost-button" onClick={()=>onNotice(t("These are placeholders, not live operating figures."))}>{t("Why no live metrics?")}</button></div>
     <div className="metric-grid">
@@ -539,7 +545,7 @@ function Overview({ onNavigate, onNotice, t, tasks, customersCount, onCreateTask
       </div>
     </div>
     <div className="section-title"><div><h2>{t("Core workspaces")}</h2><p>{t("Designed around the complete customer development loop.")}</p></div></div>
-    <div className="quick-grid">{[{id:"plans",icon:<Target size={18}/>,title:"Development Plans",desc:"Product, market, buyer profile and target"},{id:"customers",icon:<Users size={18}/>,title:"Customer assets",desc:"Search, filter, deduplicate and expand profiles"},{id:"inbox",icon:<MessageCircle size={18}/>,title:"Conversation hub",desc:"Buyer context, AI suggestions and human review"},{id:"tasks",icon:<ShieldCheck size={18}/>,title:"Execution audit",desc:"Real evidence, failures and safe recovery"}].map(x=><button className="quick-card" key={x.id} onClick={()=>onNavigate(x.id)}><span>{x.icon}</span><strong>{t(x.title)}</strong><small>{t(x.desc)}</small><ArrowUpRight size={15}/></button>)}</div>
+    <div className="quick-grid">{[{id:"plans",icon:<Target size={18}/>,title:"Development Plans",desc:"Product, market, buyer profile and target"},{id:"customers",icon:<Users size={18}/>,title:"Customer assets",desc:"Search, filter, deduplicate and expand profiles"},{id:"inbox",icon:<MessageCircle size={18}/>,title:"Conversation hub",desc:"Buyer context, AI suggestions and human review"},{id:"tasks",icon:<ShieldCheck size={18}/>,title:"Execution audit",desc:"Real evidence, failures and safe recovery"},{id:"nurturing",icon:<RefreshCw size={18}/>,title:"Customer nurturing",desc:"Human-reviewed follow-ups and buyer-aware timing"}].map(x=><button className="quick-card" key={x.id} onClick={()=>onNavigate(x.id)}><span>{x.icon}</span><strong>{t(x.title)}</strong><small>{t(x.desc)}</small><ArrowUpRight size={15}/></button>)}</div>
   </section>;
 }
 
@@ -593,6 +599,48 @@ function TaskForm({customers,initialCustomer,onClose,onSave,t}:{customers:Custom
 function Metric({icon,label,value,hint,t}:{icon:React.ReactNode;label:string;value:string;hint:string;t:(value:string)=>string}) {
   return <div className="metric-card"><div className="metric-top"><span className="metric-icon">{icon}</span><span className="metric-period">{t("LIVE DATA PENDING")}</span></div><strong>{value}</strong><span className="metric-label">{label}</span><small>{hint}</small></div>;
 }
+
+function RunPreflight({t,onBack,onNotice}:{t:(value:string)=>string;onBack:()=>void;onNotice:(message:string)=>void}) {
+  const [target,setTarget]=useState("100");
+  const [market,setMarket]=useState("Peru, Chile, Brazil");
+  const [maxSearch,setMaxSearch]=useState("500");
+  const [checked,setChecked]=useState([true,true,true,false,false]);
+  const checks=["Development plan has product, market and buyer profile","Search provider is connected and tested","AI model provider is connected and tested","Mailbox sending account is connected","Suppression, deduplication and evidence rules are active"];
+  return <section>
+    <div className="page-heading"><div><div className="eyebrow">{t("PRE-RUN SAFETY CHECK")}</div><h1>{t("Prepare development run")}</h1><p>{t("A launch checklist, not an execution claim. Nothing will run in this preview.")}</p></div><button className="secondary-button" onClick={onBack}><ArrowRight size={15}/> {t("Back to plans")}</button></div>
+    <div className="preflight-grid">
+      <div className="panel">
+        <div className="panel-heading"><div><h2>{t("Development scope")}</h2><p>{t("Set the intended target before any worker can be started.")}</p></div></div>
+        <label className="preflight-field">{t("Target market")}<input value={market} onChange={e=>setMarket(e.target.value)}/></label>
+        <div className="preflight-two"><label className="preflight-field">{t("Effective new customer target")}<input type="number" min="1" max="1000" value={target} onChange={e=>setTarget(e.target.value)}/></label><label className="preflight-field">{t("Maximum company candidates")}<input type="number" min="1" max="5000" value={maxSearch} onChange={e=>setMaxSearch(e.target.value)}/></label></div>
+        <div className="notice-card"><ShieldCheck size={18}/><div><strong>{t("Target counts only verified unique companies")}</strong><p>{t("Duplicates, invalid companies and unverified contacts do not count toward the effective target. Search stops at configured limits.")}</p></div></div>
+      </div>
+      <div className="panel">
+        <div className="panel-heading"><div><h2>{t("Readiness checklist")}</h2><p>{t("Unmet requirements block production execution.")}</p></div><badge className="stage-tag">{t("Preview only")}</badge></div>
+        <div className="preflight-checklist">{checks.map((x,i)=><label key={x}><input type="checkbox" checked={checked[i]} onChange={e=>setChecked(prev=>prev.map((v,j)=>j===i?e.target.checked:v))}/><span>{t(x)}</span><small>{i<3?"Design check":"Integration required"}</small></label>)}</div>
+        <div className="preflight-status"><CircleAlert size={17}/><span>{t("Production readiness cannot be confirmed: live providers, mailbox, database and independent workers are not connected.")}</span></div>
+        <button className="primary-button" disabled><Zap size={16}/> {t("Production launch locked")}</button>
+        <p className="local-storage-note">{t("This control is intentionally disabled. A future launch must create a run ID, queue persisted tasks and verify each result independently.")}</p>
+      </div>
+    </div>
+    <div className="panel run-contract"><h2>{t("What a real run must guarantee")}</h2><div className="run-contract-grid"><span><ShieldCheck/> {t("Independent evidence validation")}</span><span><RefreshCw/> {t("Idempotent retries and reconciliation")}</span><span><Users/> {t("Human approval for every follow-up")}</span><span><BanIcon/> {t("Suppression and opt-out enforcement")}</span></div></div>
+  </section>;
+}
+function BanIcon(){return <CircleAlert size={17}/>}
+function NurturingCenter({t,onNotice}:{t:(value:string)=>string;onNotice:(message:string)=>void}) {
+  const [view,setView]=useState("review");
+  const tabs=[["review","Due for review"],["signals","Engagement signals"],["active","Active sequences"],["paused","Paused & nurture"],["analytics","Sequence analytics"]];
+  return <section>
+    <div className="page-heading"><div><div className="eyebrow">{t("CUSTOMER RELATIONSHIP DEVELOPMENT")}</div><h1>{t("Customer Nurturing")}</h1><p>{t("Every follow-up is prepared by AI and approved by a person before sending.")}</p></div><span className="stage-tag">{t("Design preview")}</span></div>
+    <div className="nurture-policy"><ShieldCheck size={20}/><div><strong>{t("Human approval required for every follow-up")}</strong><p>{t("AI recommends recipient-local timing using working hours, engagement confidence and contact history. It never sends on its own.")}</p></div></div>
+    <div className="nurture-metrics"><div><strong>—</strong><span>{t("Due for review")}</span></div><div><strong>—</strong><span>{t("Active sequences")}</span></div><div><strong>—</strong><span>{t("Replies received")}</span></div><div><strong>—</strong><span>{t("Suppressed endpoints")}</span></div></div>
+    <div className="nurture-tabs">{tabs.map(([id,label])=><button key={id} className={view===id?"nurture-tab active":"nurture-tab"} onClick={()=>setView(id)}>{t(label)}</button>)}</div>
+    <div className="panel nurture-empty"><div className="empty-icon"><RefreshCw size={24}/></div><h2>{t(tabs.find(x=>x[0]===view)?.[1]||"Due for review")}</h2><p>{t("No live follow-up records are available. Connect a mailbox and event synchronizer before showing customer engagement or creating send approvals.")}</p><div className="nurture-empty-rules"><span><Clock3 size={15}/> {t("Recipient-local time recommendation")}</span><span><EyeIcon/> {t("Open events marked unverified")}</span><span><Mail size={15}/> {t("Human approval for every send")}</span></div><button className="secondary-button" onClick={()=>onNotice(t("No customer has been contacted. This is a design-only preview."))}>{t("Why is this empty?")}</button></div>
+    <div className="notice-card"><ShieldCheck size={18}/><div><strong>{t("No false engagement metrics")}</strong><p>{t("Open pixels are weak signals, not proof of human reading. Replies, bounces, opt-outs and provider events must be independently synchronized and deduplicated.")}</p></div></div>
+  </section>;
+}
+function EyeIcon(){return <Globe2 size={15}/>}
+
 function CustomerDrawer({customer,onClose,onCreateTask,t}:{customer:Customer;onClose:()=>void;onCreateTask:()=>void;t:(value:string)=>string}) {
   return <div className="drawer-backdrop" onClick={onClose}><aside className="customer-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-top"><div><div className="eyebrow">{t("CUSTOMER PROFILE")}</div><h2>{customer.company}</h2><p>{customer.country} · {customer.type}</p></div><button className="icon-button" onClick={onClose}><X size={18}/></button></div><div className="drawer-summary"><Sparkles size={16}/><div><strong>{t("AI business summary")}</strong><p>{customer.summary}</p></div></div><div className="drawer-section"><h3>{t("Business snapshot")}</h3><div className="detail-grid"><div><span>{t("Product fit")}</span><strong>{customer.product}</strong></div><div><span>{t("Customer grade")}</span><strong>{customer.grade} · evidence pending</strong></div><div><span>{t("Development stage")}</span><strong>{customer.stage}</strong></div><div><span>{t("Last updated")}</span><strong>{customer.updated}</strong></div></div></div><div className="drawer-section"><h3>{t("Contact information")}</h3><div className="contact-record"><Mail size={16}/><div><strong>{customer.email}</strong><span>{customer.emailStatus}</span></div></div><div className="contact-record"><Users size={16}/><div><strong>{customer.contact}</strong><span>{t("Identity and role require source verification")}</span></div></div>{customer.website&&<div className="contact-record"><Globe2 size={16}/><div><strong>{customer.website}</strong><span>{t("Company website")}</span></div></div>}{customer.sourceUrl&&<div className="contact-record"><ExternalLink size={16}/><div><strong>{customer.sourceUrl}</strong><span>{t("Source record")}</span></div></div>}</div><div className="drawer-section"><h3>{t("Opportunities & interactions")}</h3><div className="next-action-card"><Target size={17}/><div><strong>{customer.product}</strong><span>{t("Initial product interest · qualification not completed")}</span></div></div><div className="contact-record"><MessageCircle size={16}/><div><strong>{t("No verified interaction history yet")}</strong><span>{t("Communication history will be added after mailbox and messaging connections.")}</span></div></div></div><div className="drawer-section"><h3>{t("Next best action")}</h3><div className="next-action-card"><Target size={17}/><div><strong>{customer.next}</strong><span>{t("Recommendation only · not an executed task")}</span></div></div></div><div className="drawer-actions"><button className="secondary-button" onClick={()=>navigator.clipboard?.writeText(customer.company)}>{t("Copy company name")}</button><button className="primary-button" onClick={onCreateTask}>{t("Create follow-up task")}</button></div></aside></div>;
 }
