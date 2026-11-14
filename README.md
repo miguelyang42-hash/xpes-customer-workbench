@@ -1,6 +1,6 @@
-# XPES AI Sales Engine
+# AI Sales Workspace
 
-Independent V1.0 workspace for XPES customer development.
+Independent V1.0 workspace for customer development.
 
 ## Product principles
 - Model-agnostic: providers are adapters, not workflow dependencies.
