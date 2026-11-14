@@ -5,14 +5,21 @@ import {
   ArrowRight, ArrowUpRight, Bell, Bot, Building2, CheckCircle2, ChevronDown, ChevronRight,
   CircleAlert, ClipboardList, CircleHelp, Compass, Download, ExternalLink, Globe2, Inbox,
   Layers3, Mail, Menu, MessageCircle, MoreHorizontal, Plus, Search, Send, Settings2,
-  ShieldCheck, Sparkles, Target, Users, X, Zap, RefreshCw, PanelRight
+  ShieldCheck, Sparkles, Target, Users, X, Zap, RefreshCw, PanelRight, CalendarDays, Clock3, ListTodo
 } from "lucide-react";
 
 type Customer = {
   id: number; company: string; country: string; product: string; type: string;
   grade: "A" | "B" | "C"; stage: string; next: string; contact: string;
   email: string; emailStatus: string; summary: string; updated: string;
+  website?: string; sourceUrl?: string; createdAt?: string;
 };
+type FollowUpTask = {
+  id: string; title: string; description: string; dueDate: string;
+  priority: "urgent" | "high" | "normal" | "low"; status: "open" | "completed" | "cancelled";
+  customerId?: number; customerName?: string; createdAt: string; completedAt?: string;
+};
+const todayLocal = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
 const customers: Customer[] = [
   { id: 1, company: "Nordic Water Systems", country: "Sweden", product: "UV water disinfection", type: "System integrator", grade: "A", stage: "Technical inquiry", next: "Confirm UVT and flow rate", contact: "Technical Manager · unverified", email: "contact@nordicwater.example", emailStatus: "Needs verification", summary: "Industrial water-treatment integrator. Initial interest in UV equipment; operating conditions are not yet confirmed.", updated: "Today, 10:42" },
   { id: 2, company: "SolarGuard Outdoor", country: "United States", product: "Solar mosquito killer", type: "Brand / distributor", grade: "A", stage: "Awaiting reply", next: "Review buyer response", contact: "Purchasing Manager · source pending", email: "buyer@solarguard.example", emailStatus: "Unverified", summary: "Outdoor pest-control product range. Potential fit for private-label product expansion; verify product category and sourcing role.", updated: "Yesterday" },
@@ -246,7 +253,75 @@ const translations: Record<string, string> = {
   "Conversation hub": "客户会话中心",
   "Execution audit": "执行审计",
   "Demo reply copied. No email has been sent.": "已复制演示回复，没有发送邮件。",
-  "Connect the live database before creating tasks.": "请先连接真实数据库，再创建跟进任务。"
+  "Connect the live database before creating tasks.": "请先连接真实数据库，再创建跟进任务。",
+  "Today's Action Center": "今日行动中心",
+  "Today": "今天",
+  "Overdue": "已逾期",
+  "Open tasks": "待办任务",
+  "Create task": "新建任务",
+  "No follow-up tasks yet": "还没有跟进任务",
+  "Create your first task so the system can help you keep the next step visible.": "创建第一条跟进任务，让系统帮你持续掌握客户下一步行动。",
+  "Due": "截止日期",
+  "Priority": "优先级",
+  "Mark complete": "标记完成",
+  "Completed": "已完成",
+  "Open": "待处理",
+  "Cancelled": "已取消",
+  "Urgent": "紧急",
+  "High": "高",
+  "Normal": "普通",
+  "Low": "低",
+  "All tasks": "全部任务",
+  "Open only": "只看待处理",
+  "Completed only": "只看已完成",
+  "Task saved in this browser. Cloud sync will be enabled after database setup.": "任务已保存在当前浏览器。连接数据库后才能云端同步。",
+  "Customer saved in this browser. Cloud sync will be enabled after database setup.": "客户已保存在当前浏览器。连接数据库后才能云端同步。",
+  "Add customer": "新增客户",
+  "Company name": "公司名称",
+  "Country": "国家",
+  "Website": "公司网站",
+  "Product interest": "感兴趣的产品",
+  "Company type": "公司类型",
+  "Contact name": "联系人姓名",
+  "Job title": "职位",
+  "Email": "邮箱",
+  "Source URL": "信息来源链接",
+  "Notes": "备注",
+  "Save customer": "保存客户",
+  "Cancel": "取消",
+  "New customer": "新增客户",
+  "New follow-up task": "新建跟进任务",
+  "Task title": "任务标题",
+  "Related customer": "关联客户",
+  "No customer linked": "暂不关联客户",
+  "Description": "任务说明",
+  "Due date": "截止日期",
+  "Save task": "保存任务",
+  "Saved in this browser": "保存在当前浏览器",
+  "Cloud database not connected": "云端数据库尚未连接",
+  "Local draft data only. Do not use this browser-only preview as your sole business record.": "当前仅保存在本浏览器。不要将此预览版作为唯一业务档案。",
+  "Follow-up task": "客户跟进",
+  "Task status": "任务状态",
+  "Customer profile": "客户档案",
+  "Add contact and opportunity records in the next database stage.": "联系人和商机独立档案将在数据库阶段接入。",
+  "No customers match your filters.": "没有符合筛选条件的客户。",
+  "All records": "全部记录",
+  "Customer records": "客户档案",
+  "Search by company, contact, email, country or product.": "按公司、联系人、邮箱、国家或产品搜索。",
+  "Demo records are examples; records you add are saved locally until cloud setup.": "演示客户仅供参考；你新增的记录在云端连接前保存在本地。",
+  "Task completed manually. No external message was sent.": "已由人工标记任务完成，没有发送任何外部消息。",
+  "Add a customer first": "请先新增客户",
+  "Select a customer": "选择客户",
+  "Today's tasks": "今日任务",
+  "No overdue tasks": "没有逾期任务",
+  "Task history": "任务记录",
+  "Created locally": "本地创建",
+  "Company": "公司",
+  "Stage": "阶段",
+  "Next action": "下一步行动",
+  "Verify company and contact": "核实公司和联系人",
+  "A new customer record. Verify the company and contact before outreach.": "新建客户档案。触达前请核实公司和联系人。",
+  "This is a manual reminder. It does not send a message or claim external work was completed.": "这是人工跟进提醒，不会发送消息，也不会声称外部工作已完成。"
 };
 type Language = "en" | "zh";
 
@@ -265,18 +340,58 @@ export default function Home() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [mailTab, setMailTab] = useState("All");
   const [draft, setDraft] = useState("Hi Alex,\n\nI noticed your company offers outdoor pest-control products. Would adding a private-label solar mosquito killer help expand your current range?\n\nWe can share a short comparison of suitable configurations for your market. Would that be useful?\n\nBest regards,\nSales Team");
+  const [extraCustomers, setExtraCustomers] = useState<Customer[]>([]);
+  const [tasks, setTasks] = useState<FollowUpTask[]>([]);
+  const [storageReady, setStorageReady] = useState(false);
+  const [customerModal, setCustomerModal] = useState(false);
+  const [taskModal, setTaskModal] = useState(false);
+  const [taskCustomer, setTaskCustomer] = useState<Customer | null>(null);
+  const allCustomers = useMemo(() => [...extraCustomers, ...customers], [extraCustomers]);
+  useEffect(() => {
+    try {
+      const savedCustomers = window.localStorage.getItem("ai-sales-workspace-customers");
+      const savedTasks = window.localStorage.getItem("ai-sales-workspace-tasks");
+      if (savedCustomers) setExtraCustomers(JSON.parse(savedCustomers));
+      if (savedTasks) setTasks(JSON.parse(savedTasks));
+    } catch { /* Invalid local preview data is ignored safely. */ }
+    setStorageReady(true);
+  }, []);
+  useEffect(() => {
+    if (!storageReady) return;
+    window.localStorage.setItem("ai-sales-workspace-customers", JSON.stringify(extraCustomers));
+    window.localStorage.setItem("ai-sales-workspace-tasks", JSON.stringify(tasks));
+  }, [extraCustomers, tasks, storageReady]);
 
-  const filtered = useMemo(() => customers.filter(c => {
+  const filtered = useMemo(() => allCustomers.filter(c => {
     const text = [c.company, c.country, c.product, c.type, c.contact, c.email].join(" ").toLowerCase();
     return (!query || text.includes(query.toLowerCase()))
       && (country === "All countries" || c.country === country)
       && (stage === "All stages" || c.stage === stage)
       && (product === "All products" || c.product === product);
-  }), [query, country, stage, product]);
+  }), [allCustomers, query, country, stage, product]);
 
   const showNotice = (message: string) => {
     setNotice(message);
     window.setTimeout(() => setNotice(""), 3200);
+  };
+  const saveCustomer = (customer: Customer) => {
+    setExtraCustomers(prev => [customer, ...prev]);
+    setCustomerModal(false);
+    showNotice(t("Customer saved in this browser. Cloud sync will be enabled after database setup."));
+  };
+  const saveTask = (task: FollowUpTask) => {
+    setTasks(prev => [task, ...prev]);
+    setTaskModal(false);
+    setTaskCustomer(null);
+    showNotice(t("Task saved in this browser. Cloud sync will be enabled after database setup."));
+  };
+  const openTaskModal = (customer: Customer | null = null) => {
+    setTaskCustomer(customer);
+    setTaskModal(true);
+  };
+  const completeTask = (id: string) => {
+    setTasks(prev => prev.map(task => task.id === id ? { ...task, status: "completed", completedAt: new Date().toISOString() } : task));
+    showNotice(t("Task completed manually. No external message was sent."));
   };
   const title = t(navGroups.flatMap(g => g.items).find(i => i.id === active)?.label ?? "Command Center");
 
@@ -322,13 +437,13 @@ export default function Home() {
         </header>
 
         <div className="page-content">
-          {active === "overview" && <Overview onNavigate={setActive} onNotice={showNotice} t={t}/>}
+          {active === "overview" && <Overview onNavigate={setActive} onNotice={showNotice} t={t} tasks={tasks} customersCount={allCustomers.length} onCreateTask={()=>openTaskModal(null)} onCompleteTask={completeTask}/>}
           {active === "customers" && <section>
-            <div className="page-heading"><div><div className="eyebrow">{t("CUSTOMER ASSETS")}</div><h1>{t("Customer Database")}</h1><p>{t("A clean view of every account, contact and next action.")}</p></div><button className="primary-button" onClick={() => showNotice(t("Customer creation will be enabled after the database is connected."))}><Plus size={16}/> {t("Add customer")}</button></div>
+            <div className="page-heading"><div><div className="eyebrow">{t("CUSTOMER ASSETS")}</div><h1>{t("Customer Database")}</h1><p>{t("A clean view of every account, contact and next action.")}</p></div><button className="primary-button" onClick={() => setCustomerModal(true)}><Plus size={16}/> {t("Add customer")}</button></div>
             <div className="filter-panel">
               <div className="search-box"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Search company, country, product, contact…")}/></div>
-              <select value={country} onChange={e=>setCountry(e.target.value)}><option>{t("All countries")}</option>{Array.from(new Set(customers.map(c=>c.country))).sort().map(c=><option key={c}>{c}</option>)}</select>
-              <select value={product} onChange={e=>setProduct(e.target.value)}><option>{t("All products")}</option>{Array.from(new Set(customers.map(c=>c.product))).map(p=><option key={p}>{p}</option>)}</select>
+              <select value={country} onChange={e=>setCountry(e.target.value)}><option>{t("All countries")}</option>{Array.from(new Set(allCustomers.map(c=>c.country))).sort().map(c=><option key={c}>{c}</option>)}</select>
+              <select value={product} onChange={e=>setProduct(e.target.value)}><option>{t("All products")}</option>{Array.from(new Set(allCustomers.map(c=>c.product))).map(p=><option key={p}>{p}</option>)}</select>
               <select value={stage} onChange={e=>setStage(e.target.value)}>{stageOptions.map(s=><option key={s}>{t(s)}</option>)}</select>
               <button className="secondary-button compact" onClick={()=>{setQuery("");setCountry("All countries");setProduct("All products");setStage("All stages");}}><RefreshCw size={15}/> {t("Reset")}</button>
             </div>
@@ -336,10 +451,10 @@ export default function Home() {
               <div className="table-toolbar"><div><strong>{filtered.length} {t("accounts")}</strong><span> · {t("Click a row to view the full profile")}</span></div><button className="ghost-button" onClick={()=>showNotice("Export will be enabled when the customer database is connected.")}><Download size={15}/> {t("Export")}</button></div>
               <div className="table-wrap"><table><thead><tr><th>{t("COMPANY")}</th><th>{t("COUNTRY")}</th><th>{t("PRODUCT FIT")}</th><th>{t("STAGE")}</th><th>{t("GRADE")}</th><th>{t("NEXT ACTION")}</th></tr></thead><tbody>
                 {filtered.map(c=><tr key={c.id} onClick={()=>setSelected(c)} className="click-row"><td><div className="company-cell"><div className="company-logo">{c.company.slice(0,1)}</div><div><strong>{c.company}</strong><span>{t(c.type)}</span></div></div></td><td>{c.country}</td><td>{c.product}</td><td><span className={"stage-tag " + (c.stage==="Do not contact"?"stage-danger":c.stage==="Awaiting reply"||c.stage==="Technical inquiry"?"stage-green":"")}>{t(c.stage)}</span></td><td><span className={"grade grade-"+c.grade.toLowerCase()}>{c.grade}</span></td><td><span className="next-action">{t(c.next)}</span></td></tr>)}
-              </tbody></table>{filtered.length===0&&<div className="empty-state">{t("No matching accounts. Try changing your filters.")}</div>}</div>
-              <div className="table-footer">{t("Showing")} {filtered.length} {t("sample accounts")} <span>{t("Demo data · not connected to a live CRM")}</span></div>
+              </tbody></table>{filtered.length===0&&<div className="empty-state">{t("No customers match your filters.")}</div>}</div>
+              <div className="table-footer">{t("Showing")} {filtered.length} {t("accounts")} <span>{t("Demo records are examples; records you add are saved locally until cloud setup.")}</span></div>
             </div>
-            {selected && <CustomerDrawer customer={selected} onClose={()=>setSelected(null)} t={t}/>}
+            {selected && <CustomerDrawer customer={selected} onClose={()=>setSelected(null)} onCreateTask={()=>{openTaskModal(selected);setSelected(null);}} t={t}/>}
           </section>}
 
           {active === "plans" && <section>
@@ -362,7 +477,7 @@ export default function Home() {
 
           {active === "mail" && <section><div className="page-heading"><div><div className="eyebrow">EMAIL OPERATIONS</div><h1>{t("AI Mail Manager")}</h1><p>{t("Separate AI prospecting mail from your everyday business inbox.")}</p></div><span className="stage-tag">{t("Mailbox not connected")}</span></div><div className="mail-tabs">{["All","Sent","Replies","Bounces","Unsubscribed","Auto-replies","Priority"].map(tab=><button key={tab} className={mailTab===tab?"mail-tab active-mail-tab":"mail-tab"} onClick={()=>setMailTab(tab)}>{t(tab)}</button>)}</div><div className="mail-empty"><div className="empty-icon"><Inbox size={25}/></div><h3>{mailTab==="All"?"Your AI mail workspace is ready":mailTab+" folder"}</h3><p>Connect Gmail or Tencent Enterprise Mail to synchronize real messages, delivery events and replies. Nothing will be moved or sent before you approve the connection and rules.</p><button className="secondary-button" onClick={()=>showNotice("Mailbox connection is scheduled for the integration stage. No account has been accessed.")}>View connection requirements <ArrowRight size={15}/></button></div></section>}
 
-          {active === "tasks" && <section><div className="page-heading"><div><div className="eyebrow">EXECUTION CONTROL</div><h1>{t("Tasks & Audit")}</h1><p>{t("Completion is evidence-based, never based on an AI self-report.")}</p></div></div><div className="audit-banner"><ShieldCheck size={20}/><div><strong>{t("Evidence-first task accounting")}</strong><p>{t("Every future task will have an ID, attempt history, external evidence, final state and recovery decision.")}</p></div></div><div className="audit-grid">{[{n:"Queued",v:"—",d:"Persistent pending work"},{n:"Running",v:"—",d:"Worker heartbeat"},{n:"Needs review",v:"—",d:"Uncertain or risky state"},{n:"Failed",v:"—",d:"Recorded reason and retry policy"}].map(x=><div className="metric-card" key={x.n}><span>{t(x.n)}</span><strong>{x.v}</strong><small>{t(x.d)}</small></div>)}</div><div className="table-card"><div className="table-toolbar"><strong>{t("Execution ledger")}</strong><span>{t("Live task history will appear after backend setup.")}</span></div><div className="empty-state">{t("No production tasks have been run. This is intentional: no external action is enabled in the preview.")}</div></div></section>}
+          {active === "tasks" && <TaskCenter tasks={tasks} customers={allCustomers} onCreate={()=>openTaskModal(null)} onComplete={completeTask} t={t}/>}
 
           {active === "models" && <section><div className="page-heading"><div><div className="eyebrow">MODEL-AGNOSTIC ARCHITECTURE</div><h1>{t("Model Connections")}</h1><p>{t("Choose providers independently of the business workflow.")}</p></div><button className="primary-button" onClick={()=>showNotice("Model connection setup will request your provider endpoint and API key through encrypted settings. Do not paste keys into chat.")}><Plus size={16}/> Add provider</button></div><div className="model-grid">{[{name:"OpenAI-compatible API",desc:"Custom endpoint · model name · encrypted key",tag:"Provider adapter"},{name:"DeepSeek",desc:"Optional model provider",tag:"Provider adapter"},{name:"Google Gemini",desc:"Optional model provider",tag:"Provider adapter"},{name:"Anthropic Claude",desc:"Optional model provider",tag:"Provider adapter"}].map(m=><div className="model-card" key={m.name}><div className="model-symbol"><Bot size={20}/></div><div><h3>{m.name}</h3><p>{m.desc}</p><span className="stage-tag">{m.tag}</span></div><button className="secondary-button compact" onClick={()=>showNotice("No model provider is connected yet.")}>Configure</button></div>)}</div><div className="notice-card"><ShieldCheck size={19}/><div><strong>{t("Credential safety")}</strong><p>{t("API keys will be stored server-side as encrypted secrets. They will never be exposed in browser code or chat messages.")}</p></div></div></section>}
 
@@ -370,12 +485,14 @@ export default function Home() {
         </div>
         <footer className="footer"><span>AI Sales Workspace · {t("Independent V1.0 build")}</span><span>{t("Preview environment · No live customer actions")}</span></footer>
       </section>
+      {customerModal && <CustomerForm onClose={()=>setCustomerModal(false)} onSave={saveCustomer} t={t}/>}
+      {taskModal && <TaskForm customers={allCustomers} initialCustomer={taskCustomer} onClose={()=>{setTaskModal(false);setTaskCustomer(null);}} onSave={saveTask} t={t}/>}
       {notice && <div className="toast"><CheckCircle2 size={17}/>{notice}<button onClick={() => setNotice("")}><X size={15}/></button></div>}
     </main>
   );
 }
 
-function Overview({ onNavigate, onNotice, t }: { onNavigate: (id:string)=>void; onNotice: (message:string)=>void; t: (value:string)=>string }) {
+function Overview({ onNavigate, onNotice, t, tasks, customersCount, onCreateTask, onCompleteTask }: { onNavigate: (id:string)=>void; onNotice: (message:string)=>void; t: (value:string)=>string; tasks: FollowUpTask[]; customersCount:number; onCreateTask:()=>void; onCompleteTask:(id:string)=>void }) {
   return <section>
     <div className="welcome-row"><div><div className="eyebrow">{t("SATURDAY · NOVEMBER 14, 2026")}</div><h1>{t("Good morning")}</h1><p>{t("Your sales development command center is ready.")}</p></div><button className="primary-button" onClick={()=>onNavigate("plans")}><Plus size={16}/> {t("Create development plan")}</button></div>
     <div className="preview-banner"><div className="preview-icon"><Sparkles size={18}/></div><div><strong>{t("Independent workspace initialized")}</strong><p>{t("This is the first UI build. Demo records are clearly marked; real database, AI models and mailboxes are not connected yet.")}</p></div><span className="preview-status">{t("PREVIEW")}</span></div>
@@ -387,13 +504,15 @@ function Overview({ onNavigate, onNotice, t }: { onNavigate: (id:string)=>void; 
       <Metric icon={<Target size={17}/>} label={t("Active opportunities")} value="—" hint={t("Requires real commercial progress")} t={t}/>
     </div>
     <div className="dashboard-grid">
-      <div className="panel priority-panel"><div className="panel-heading"><div><h2>{t("Priority queue")}</h2><p>{t("Suggested work · sample records")}</p></div><span className="soft-count">03</span></div>
-        {[{n:"Review a technical inquiry",d:"Nordic Water Systems · UV reactor",tag:"High priority",color:"green",action:"inbox"},{n:"Verify purchasing contact",d:"SolarGuard Outdoor · Solar mosquito killer",tag:"Needs verification",color:"amber",action:"customers"},{n:"Investigate hard-bounce source",d:"CleanTech Components · Replacement lamps",tag:"Suppressed",color:"red",action:"tasks"}].map((x,i)=><div className="priority-row" key={x.n}><div className="priority-number">0{i+1}</div><div className="priority-copy"><strong>{t(x.n)}</strong><span>{t(x.d)}</span></div><span className={"priority-tag "+x.color}>{t(x.tag)}</span><button className="row-arrow" onClick={()=>onNavigate(x.action)}><ArrowUpRight size={16}/></button></div>)}
-        <button className="panel-link" onClick={()=>onNavigate("customers")}>{t("View customer database")} <ArrowRight size={15}/></button>
+      <div className="panel priority-panel">
+        <div className="panel-heading"><div><h2>{t("Today's Action Center")}</h2><p>{t("Today's tasks")} · {tasks.filter(x=>x.status==="open" && x.dueDate<=todayLocal()).length}</p></div><button className="primary-button compact" onClick={onCreateTask}><Plus size={14}/> {t("Create task")}</button></div>
+        <TodayActionList tasks={tasks} onComplete={onCompleteTask} onCreateTask={onCreateTask} t={t}/>
       </div>
-      <div className="panel pipeline-panel"><div className="panel-heading"><div><h2>{t("Development pipeline")}</h2><p>{t("Sample stage distribution")}</p></div><button className="ghost-button" onClick={()=>onNavigate("customers")}>{t("View all")}</button></div>
-        {[{n:"Research",v:1,w:"17%"},{n:"Verification",v:1,w:"17%"},{n:"Ready for review",v:1,w:"17%"},{n:"Awaiting reply",v:1,w:"17%"},{n:"Technical inquiry",v:1,w:"17%"},{n:"Suppressed",v:1,w:"17%"}].map(x=><div className="pipeline-row" key={x.n}><span>{t(x.n)}</span><div className="pipeline-track"><div style={{width:x.w}}/></div><strong>{x.v}</strong></div>)}
-        <div className="pipeline-note"><CircleAlert size={15}/> {t("Sample distribution only. No live customer pipeline is connected.")}</div>
+      <div className="panel pipeline-panel">
+        <div className="panel-heading"><div><h2>{t("Customer records")}</h2><p>{t("Saved in this browser")}</p></div><button className="ghost-button" onClick={()=>onNavigate("customers")}>{t("View all")}</button></div>
+        <div className="portfolio-stat"><strong>{customersCount}</strong><span>{t("All records")} · {t("Demo records are examples; records you add are saved locally until cloud setup.")}</span></div>
+        <div className="pipeline-note"><CircleAlert size={15}/> {t("Local draft data only. Do not use this browser-only preview as your sole business record.")}</div>
+        <button className="panel-link" onClick={onCreateTask}>{t("Create task")} <ArrowRight size={15}/></button>
       </div>
     </div>
     <div className="section-title"><div><h2>{t("Core workspaces")}</h2><p>{t("Designed around the complete customer development loop.")}</p></div></div>
@@ -403,6 +522,6 @@ function Overview({ onNavigate, onNotice, t }: { onNavigate: (id:string)=>void; 
 function Metric({icon,label,value,hint,t}:{icon:React.ReactNode;label:string;value:string;hint:string;t:(value:string)=>string}) {
   return <div className="metric-card"><div className="metric-top"><span className="metric-icon">{icon}</span><span className="metric-period">{t("LIVE DATA PENDING")}</span></div><strong>{value}</strong><span className="metric-label">{label}</span><small>{hint}</small></div>;
 }
-function CustomerDrawer({customer,onClose,t}:{customer:Customer;onClose:()=>void;t:(value:string)=>string}) {
-  return <div className="drawer-backdrop" onClick={onClose}><aside className="customer-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-top"><div><div className="eyebrow">{t("CUSTOMER PROFILE")}</div><h2>{customer.company}</h2><p>{customer.country} · {customer.type}</p></div><button className="icon-button" onClick={onClose}><X size={18}/></button></div><div className="drawer-summary"><Sparkles size={16}/><div><strong>{t("AI business summary")}</strong><p>{customer.summary}</p></div></div><div className="drawer-section"><h3>{t("Business snapshot")}</h3><div className="detail-grid"><div><span>{t("Product fit")}</span><strong>{customer.product}</strong></div><div><span>{t("Customer grade")}</span><strong>{customer.grade} · evidence pending</strong></div><div><span>{t("Development stage")}</span><strong>{customer.stage}</strong></div><div><span>{t("Last updated")}</span><strong>{customer.updated}</strong></div></div></div><div className="drawer-section"><h3>{t("Contact information")}</h3><div className="contact-record"><Mail size={16}/><div><strong>{customer.email}</strong><span>{customer.emailStatus}</span></div></div><div className="contact-record"><Users size={16}/><div><strong>{customer.contact}</strong><span>{t("Identity and role require source verification")}</span></div></div></div><div className="drawer-section"><h3>{t("Next best action")}</h3><div className="next-action-card"><Target size={17}/><div><strong>{customer.next}</strong><span>{t("Recommendation only · not an executed task")}</span></div></div></div><div className="drawer-actions"><button className="secondary-button" onClick={()=>navigator.clipboard?.writeText(customer.company)}>{t("Copy company name")}</button><button className="primary-button" onClick={()=>alert("Connect the live database before creating tasks.")}>{t("Create follow-up task")}</button></div></aside></div>;
+function CustomerDrawer({customer,onClose,onCreateTask,t}:{customer:Customer;onClose:()=>void;onCreateTask:()=>void;t:(value:string)=>string}) {
+  return <div className="drawer-backdrop" onClick={onClose}><aside className="customer-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-top"><div><div className="eyebrow">{t("CUSTOMER PROFILE")}</div><h2>{customer.company}</h2><p>{customer.country} · {customer.type}</p></div><button className="icon-button" onClick={onClose}><X size={18}/></button></div><div className="drawer-summary"><Sparkles size={16}/><div><strong>{t("AI business summary")}</strong><p>{customer.summary}</p></div></div><div className="drawer-section"><h3>{t("Business snapshot")}</h3><div className="detail-grid"><div><span>{t("Product fit")}</span><strong>{customer.product}</strong></div><div><span>{t("Customer grade")}</span><strong>{customer.grade} · evidence pending</strong></div><div><span>{t("Development stage")}</span><strong>{customer.stage}</strong></div><div><span>{t("Last updated")}</span><strong>{customer.updated}</strong></div></div></div><div className="drawer-section"><h3>{t("Contact information")}</h3><div className="contact-record"><Mail size={16}/><div><strong>{customer.email}</strong><span>{customer.emailStatus}</span></div></div><div className="contact-record"><Users size={16}/><div><strong>{customer.contact}</strong><span>{t("Identity and role require source verification")}</span></div></div></div><div className="drawer-section"><h3>{t("Next best action")}</h3><div className="next-action-card"><Target size={17}/><div><strong>{customer.next}</strong><span>{t("Recommendation only · not an executed task")}</span></div></div></div><div className="drawer-actions"><button className="secondary-button" onClick={()=>navigator.clipboard?.writeText(customer.company)}>{t("Copy company name")}</button><button className="primary-button" onClick={onCreateTask}>{t("Create follow-up task")}</button></div></aside></div>;
 }
