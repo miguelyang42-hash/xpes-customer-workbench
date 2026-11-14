@@ -63,3 +63,69 @@ html,body{background:var(--bg);color:var(--ink)}
 
 .customer-list-card{overflow:hidden}.customer-card-list{display:flex;flex-direction:column}.customer-card{width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;border:0;border-top:1px solid #edf2f8;background:#fff;padding:15px 18px;transition:background .15s}.customer-card:hover{background:#f5f9ff}.customer-card-main{display:flex;align-items:center;gap:12px;min-width:0;flex:1}.customer-card-copy{display:flex;flex-direction:column;gap:5px;min-width:0}.customer-card-copy strong{font-size:11px;color:#244563}.customer-card-copy span{font-size:9px;color:#6e87a2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.customer-card-copy small{font-size:9px;color:#91a4b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.customer-card-side{display:flex;align-items:center;gap:10px;flex:none}.customer-card-side small{font-size:9px;color:#7890a9;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.customer-card-side>svg{color:#9aafc4}.table-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 17px;border-top:1px solid #edf2f8;color:#7189a3;font-size:9px}.table-footer span{color:#93a5b8}
 @media(max-width:760px){.customer-card{align-items:flex-start;flex-direction:column;gap:10px}.customer-card-side{width:100%;justify-content:flex-start;flex-wrap:wrap;padding-left:41px}.customer-card-side small{max-width:100%;white-space:normal}.table-footer{align-items:flex-start;flex-direction:column}}
+
+/* Readability pass: consistent, comfortable typography */
+body{font-size:14px;line-height:1.55}
+button,input,select,textarea{font-family:inherit}
+input,select,textarea{font-size:14px}
+h1{font-size:32px;line-height:1.2;letter-spacing:-.035em}
+h2{font-size:20px;line-height:1.3}
+h3{font-size:17px;line-height:1.35}
+p{line-height:1.65}
+.page-content{padding:36px 42px 48px}
+.eyebrow{font-size:11px;letter-spacing:.12em;line-height:1.5}
+.brand-name{font-size:15px}.brand-caption{font-size:10px}
+.workspace-copy strong{font-size:13px}.workspace-copy span{font-size:11px}
+.nav-label{font-size:11px;letter-spacing:.11em}
+.nav-item{height:46px;font-size:14px;gap:13px;padding:0 13px}
+.nav-count{font-size:11px}
+.system-health strong,.user-row strong{font-size:12px}.system-health span:last-child,.user-row span{font-size:11px}
+.breadcrumbs{font-size:13px}
+.language-select,.environment-pill{font-size:12px}
+.welcome-row h1{font-size:32px}.welcome-row p,.page-heading p{font-size:14px}
+.section-title h2,.panel-heading h2{font-size:19px}.section-title p,.panel-heading p{font-size:13px}
+.preview-banner strong,.notice-card strong,.audit-banner strong{font-size:14px}
+.preview-banner p,.notice-card p,.audit-banner p{font-size:13px;line-height:1.6}
+.metric-card{padding:19px}
+.metric-card>strong{font-size:27px}.metric-label{font-size:14px}.metric-card small{font-size:12px;line-height:1.5}
+.metric-period{font-size:10px}
+.panel{padding:22px}
+.priority-copy strong{font-size:14px}.priority-copy span{font-size:12px}
+.priority-tag{font-size:11px}
+.pipeline-note{font-size:12px;line-height:1.55}
+.quick-card{padding:18px;min-height:130px}.quick-card strong{font-size:15px}.quick-card small{font-size:12px;line-height:1.55}
+.primary-button,.secondary-button,.ghost-button,.text-button{font-size:14px;line-height:1.35}
+.primary-button,.secondary-button{min-height:42px;padding:10px 16px}
+.primary-button.compact,.secondary-button.compact{min-height:36px;padding:8px 12px;font-size:13px}
+.filter-panel{gap:11px}.filter-panel select{font-size:13px;min-height:40px;padding:9px 12px}
+.search-box{min-height:42px}.search-box input{font-size:14px}
+.table-toolbar strong{font-size:14px}.table-toolbar span{font-size:12px}
+th{font-size:11px;letter-spacing:.06em}td{font-size:13px;line-height:1.5}
+.company-cell strong{font-size:13px}.company-cell span{font-size:11px}
+.customer-card{padding:17px 20px}.customer-card-copy strong{font-size:14px}.customer-card-copy span{font-size:12px}.customer-card-copy small{font-size:11px}.customer-card-side small{font-size:11px}
+.stage-tag,.grade{font-size:11px}
+.table-footer{font-size:11px}
+.drawer-top h2{font-size:23px}.drawer-top p{font-size:13px}
+.drawer-summary strong,.drawer-section h3{font-size:14px}.drawer-summary p{font-size:13px}
+.detail-grid span,.contact-record span{font-size:11px}.detail-grid strong,.contact-record strong{font-size:13px}
+.next-action-card strong{font-size:14px}.next-action-card span{font-size:12px}
+.form-grid label{font-size:13px;gap:8px}
+.form-grid input,.form-grid select,.form-grid textarea{font-size:14px;padding:11px 12px;min-height:42px}
+.modal-heading h2{font-size:23px}.modal-heading p{font-size:13px}
+.modal-foot>span{font-size:11px}
+.task-empty strong{font-size:15px}.task-empty p{font-size:13px}
+.today-task-copy strong,.task-row-copy strong{font-size:13px}
+.today-task-copy span,.task-row-copy span{font-size:12px}
+.today-task-meta small,.task-row-meta small{font-size:11px}
+.task-priority{font-size:10px}
+.task-filter{font-size:13px;min-height:36px}
+.local-storage-note{font-size:11px}
+.conversation-preview strong{font-size:13px}.conversation-preview span{font-size:12px}.conversation-preview small{font-size:11px}
+.bubble{font-size:13px;line-height:1.65}
+.chat-compose textarea{font-size:14px}
+.chat-compose span{font-size:11px}
+.channel-card h3{font-size:16px}.channel-card p{font-size:13px}
+.mail-empty p{font-size:13px}
+.settings-row strong{font-size:14px}.settings-row span{font-size:12px}
+@media(max-width:900px){.page-content{padding:26px 22px 36px}.welcome-row h1,.page-heading h1{font-size:29px}}
+@media(max-width:600px){.page-content{padding:22px 15px 30px}.welcome-row h1,.page-heading h1{font-size:27px}.welcome-row p,.page-heading p{font-size:13px}.metric-card{padding:15px}.panel{padding:16px}.quick-card{min-height:115px}}
