@@ -104,7 +104,8 @@ create table if not exists public.companies (
   do_not_contact_reason text,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  unique (workspace_id, id)
 );
 
 create unique index if not exists companies_workspace_name_unique
@@ -117,7 +118,7 @@ create index if not exists companies_workspace_updated_idx
 create table if not exists public.contacts (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  company_id uuid not null references public.companies(id) on delete cascade,
+  company_id uuid not null,
   full_name text not null,
   first_name text,
   last_name text,
@@ -134,7 +135,9 @@ create table if not exists public.contacts (
   notes text,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  unique (workspace_id, id),
+  constraint contacts_company_workspace_fk foreign key (workspace_id, company_id) references public.companies(workspace_id, id) on delete cascade
 );
 create index if not exists contacts_workspace_company_idx on public.contacts(workspace_id, company_id);
 create index if not exists contacts_workspace_name_idx on public.contacts(workspace_id, lower(full_name));
@@ -142,7 +145,7 @@ create index if not exists contacts_workspace_name_idx on public.contacts(worksp
 create table if not exists public.contact_methods (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  contact_id uuid not null references public.contacts(id) on delete cascade,
+  contact_id uuid not null,
   channel text not null check (channel in ('email','phone','whatsapp','linkedin','instagram','facebook','website','other')),
   value text not null,
   normalized_value text not null,
@@ -156,7 +159,8 @@ create table if not exists public.contact_methods (
   suppressed_at timestamptz,
   suppression_reason text,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint contact_methods_contact_workspace_fk foreign key (workspace_id, contact_id) references public.contacts(workspace_id, id) on delete cascade
 );
 create unique index if not exists contact_methods_workspace_channel_value_unique
   on public.contact_methods(workspace_id, channel, normalized_value);
@@ -172,14 +176,15 @@ create table if not exists public.products (
   is_active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique(workspace_id, name)
+  unique(workspace_id, name),
+  unique (workspace_id, id)
 );
 
 create table if not exists public.opportunities (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  company_id uuid not null references public.companies(id) on delete cascade,
-  primary_contact_id uuid references public.contacts(id) on delete set null,
+  company_id uuid not null,
+  primary_contact_id uuid,
   title text not null,
   stage text not null default 'new'
     check (stage in ('new','research','verification','first_touch','engaged','needs_confirmed','quotation','negotiation','won','lost','paused')),
@@ -194,19 +199,24 @@ create table if not exists public.opportunities (
   next_step_due_at timestamptz,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  unique (workspace_id, id),
+  constraint opportunities_company_workspace_fk foreign key (workspace_id, company_id) references public.companies(workspace_id, id) on delete cascade,
+  constraint opportunities_contact_workspace_fk foreign key (workspace_id, primary_contact_id) references public.contacts(workspace_id, id) on delete set null (primary_contact_id)
 );
 create index if not exists opportunities_workspace_stage_idx on public.opportunities(workspace_id, stage);
 create index if not exists opportunities_company_idx on public.opportunities(workspace_id, company_id);
 
 create table if not exists public.opportunity_products (
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  opportunity_id uuid not null references public.opportunities(id) on delete cascade,
-  product_id uuid not null references public.products(id) on delete restrict,
+  opportunity_id uuid not null,
+  product_id uuid not null,
   quantity numeric(14,2),
   unit text,
   notes text,
-  primary key (opportunity_id, product_id)
+  primary key (opportunity_id, product_id),
+  constraint opportunity_products_opportunity_workspace_fk foreign key (workspace_id, opportunity_id) references public.opportunities(workspace_id, id) on delete cascade,
+  constraint opportunity_products_product_workspace_fk foreign key (workspace_id, product_id) references public.products(workspace_id, id) on delete restrict
 );
 
 -- External accounts are metadata only. OAuth tokens/API secrets belong in a secret manager, never in this table.
@@ -225,17 +235,18 @@ create table if not exists public.channel_accounts (
   last_synced_at timestamptz,
   last_error text,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  unique (workspace_id, id)
 );
 create index if not exists channel_accounts_workspace_provider_idx on public.channel_accounts(workspace_id, provider);
 
 create table if not exists public.interactions (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  company_id uuid not null references public.companies(id) on delete cascade,
-  contact_id uuid references public.contacts(id) on delete set null,
-  opportunity_id uuid references public.opportunities(id) on delete set null,
-  channel_account_id uuid references public.channel_accounts(id) on delete set null,
+  company_id uuid not null,
+  contact_id uuid,
+  opportunity_id uuid,
+  channel_account_id uuid,
   channel text not null check (channel in ('email','whatsapp','linkedin','instagram','facebook','phone','meeting','website','other')),
   direction text not null check (direction in ('inbound','outbound','internal')),
   interaction_type text not null default 'message',
@@ -248,7 +259,11 @@ create table if not exists public.interactions (
   occurred_at timestamptz not null default now(),
   source_url text,
   created_by uuid references auth.users(id) on delete set null,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint interactions_company_workspace_fk foreign key (workspace_id, company_id) references public.companies(workspace_id, id) on delete cascade,
+  constraint interactions_contact_workspace_fk foreign key (workspace_id, contact_id) references public.contacts(workspace_id, id) on delete set null (contact_id),
+  constraint interactions_opportunity_workspace_fk foreign key (workspace_id, opportunity_id) references public.opportunities(workspace_id, id) on delete set null (opportunity_id),
+  constraint interactions_channel_account_workspace_fk foreign key (workspace_id, channel_account_id) references public.channel_accounts(workspace_id, id) on delete set null (channel_account_id)
 );
 create unique index if not exists interactions_external_message_unique
   on public.interactions(workspace_id, channel_account_id, external_message_id)
@@ -260,7 +275,7 @@ create table if not exists public.development_plans (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
   name text not null,
-  product_id uuid references public.products(id) on delete set null,
+  product_id uuid,
   target_markets jsonb not null default '[]'::jsonb,
   buyer_profile text,
   inclusion_rules jsonb not null default '{}'::jsonb,
@@ -269,16 +284,18 @@ create table if not exists public.development_plans (
   status text not null default 'draft' check (status in ('draft','ready','running','paused','completed','archived')),
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  unique (workspace_id, id),
+  constraint development_plans_product_workspace_fk foreign key (workspace_id, product_id) references public.products(workspace_id, id) on delete set null (product_id)
 );
 
 create table if not exists public.follow_up_tasks (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  company_id uuid references public.companies(id) on delete set null,
-  contact_id uuid references public.contacts(id) on delete set null,
-  opportunity_id uuid references public.opportunities(id) on delete set null,
-  development_plan_id uuid references public.development_plans(id) on delete set null,
+  company_id uuid,
+  contact_id uuid,
+  opportunity_id uuid,
+  development_plan_id uuid,
   title text not null,
   description text,
   task_type text not null default 'follow_up'
@@ -292,7 +309,11 @@ create table if not exists public.follow_up_tasks (
   completion_evidence jsonb not null default '{}'::jsonb,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint tasks_company_workspace_fk foreign key (workspace_id, company_id) references public.companies(workspace_id, id) on delete set null (company_id),
+  constraint tasks_contact_workspace_fk foreign key (workspace_id, contact_id) references public.contacts(workspace_id, id) on delete set null (contact_id),
+  constraint tasks_opportunity_workspace_fk foreign key (workspace_id, opportunity_id) references public.opportunities(workspace_id, id) on delete set null (opportunity_id),
+  constraint tasks_plan_workspace_fk foreign key (workspace_id, development_plan_id) references public.development_plans(workspace_id, id) on delete set null (development_plan_id)
 );
 create index if not exists tasks_workspace_due_idx on public.follow_up_tasks(workspace_id, status, due_at);
 create index if not exists tasks_workspace_assignee_idx on public.follow_up_tasks(workspace_id, assigned_to, status);
@@ -300,11 +321,12 @@ create index if not exists tasks_workspace_assignee_idx on public.follow_up_task
 create table if not exists public.task_events (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  task_id uuid not null references public.follow_up_tasks(id) on delete cascade,
+  task_id uuid not null,
   event_type text not null check (event_type in ('created','assigned','started','rescheduled','completed','reopened','cancelled','note_added','evidence_added')),
   details jsonb not null default '{}'::jsonb,
   actor_id uuid references auth.users(id) on delete set null,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint task_events_task_workspace_fk foreign key (workspace_id, task_id) references public.follow_up_tasks(workspace_id, id) on delete cascade
 );
 create index if not exists task_events_task_time_idx on public.task_events(workspace_id, task_id, created_at desc);
 
@@ -338,12 +360,12 @@ create policy workspaces_select_member on public.workspaces for select to authen
 create policy workspace_members_select_self_or_admin on public.workspace_members for select to authenticated
   using (user_id = auth.uid() or public.is_workspace_admin(workspace_id));
 
-do $$
+do $
 declare tbl text;
 begin
   foreach tbl in array array[
     'companies','contacts','contact_methods','products','opportunities','opportunity_products',
-    'channel_accounts','interactions','development_plans','follow_up_tasks','task_events','audit_events'
+    'channel_accounts','interactions','development_plans','follow_up_tasks'
   ] loop
     execute format('alter table public.%I enable row level security', tbl);
     execute format('drop policy if exists workspace_member_all on public.%I', tbl);
@@ -352,8 +374,17 @@ begin
       tbl
     );
   end loop;
+
+  -- Event ledgers are append-only: members can read and add events, but cannot rewrite history.
+  foreach tbl in array array['task_events','audit_events'] loop
+    execute format('alter table public.%I enable row level security', tbl);
+    execute format('drop policy if exists workspace_member_select on public.%I', tbl);
+    execute format('drop policy if exists workspace_member_insert on public.%I', tbl);
+    execute format('create policy workspace_member_select on public.%I for select to authenticated using (public.is_workspace_member(workspace_id))', tbl);
+    execute format('create policy workspace_member_insert on public.%I for insert to authenticated with check (public.is_workspace_member(workspace_id))', tbl);
+  end loop;
 end;
-$$;
+$;
 
 revoke all on function public.is_workspace_member(uuid) from public;
 revoke all on function public.is_workspace_admin(uuid) from public;
