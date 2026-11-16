@@ -4,9 +4,9 @@ Status: Approved product-design decision for the next workspace design iteration
 
 ## 1. Confirmed operating decisions
 
-1. Every follow-up message requires human review and explicit approval before sending.
+1. Routine email outreach (initial email and follow-ups 2–4) is sent automatically only within a one-time, versioned user-approved development-plan authorization. Individual email approval is not required.
 2. AI recommends the next follow-up time using the contact's local working hours, observed engagement events and that contact's historical interaction pattern.
-3. AI may research, reason, draft, score and schedule a reminder. AI must not send a follow-up automatically under this approved mode.
+3. AI may research, reason, draft, score, schedule and send email touches within the approved plan limits. AI must not expand the authorization or send outside the approved scope.
 4. Email-open events are weak engagement signals, not proof that a person read or understood a message.
 5. Every send, delivery, open, reply, bounce, unsubscribe and approval must be represented by its own evidence-backed event. AI text is not evidence.
 6. The follow-up sequence is contact-specific, while the company account and opportunity provide shared context.
@@ -105,9 +105,9 @@ If timezone or working hours are uncertain, show the uncertainty and request a h
 
 The timing engine should use engagement as one signal among several. A suspected open may raise review priority, but it must not shorten a minimum cooldown or bypass human approval.
 
-## 6. Human review and send gate
+## 6. Plan authorization and deterministic send gate
 
-Every follow-up appears in **Due for review**. The review card must show:
+Every follow-up is prepared by AI and checked by deterministic policy/quality gates. Routine emails inside the approved plan do not enter a per-message approval queue. The monitoring view must show:
 - Company and contact identity, role and recipient endpoint
 - Source and verification status of the contact details
 - Previous message, previous send time and sequence touch number
@@ -121,17 +121,13 @@ Every follow-up appears in **Due for review**. The review card must show:
 - Suppression, frequency and duplicate checks
 
 Human actions:
-- Approve and send now
-- Approve for the proposed time (requires a scheduled-send service and still records the human approval)
-- Edit, then approve
-- Ask AI to revise
-- Reject this draft
-- Pause sequence
-- Stop sequence / do not contact
+- Pause or resume an authorized plan
+- Edit plan scope and re-authorize when material fields change
+- Pause or stop a contact sequence
+- Review exceptions and low-confidence drafts
+- Edit a future message strategy or disable automatic follow-up
 
-Approval is tied to the exact recipient, channel account, message content hash/version and proposed send time. If the content, recipient, mailbox or material send parameters change after approval, invalidate the approval and require review again. Do not allow an AI worker to reuse an old approval for a changed draft.
-
-Under the confirmed manual-review mode, a scheduled approved message may be dispatched by a deterministic delivery worker only if the user explicitly approved that exact version and time. The AI model itself never decides to send.
+The authorization is tied to an immutable plan version, permitted recipient scope, sending account, sequence cap, frequency limits, local-time windows, compliance settings and expiry. Any material change invalidates the authorization and requires a new human approval. The AI model cannot create or broaden authorization. A deterministic policy service must approve each send attempt against the active plan authorization and current suppression/event state.
 
 ## 7. Stop, pause and handoff rules
 
@@ -202,8 +198,8 @@ Do not present “open rate” as a reliable measure of human reading. Label it 
 2. Multiple open events for the same message create one engagement summary, not multiple follow-up tasks.
 3. A privacy-proxy/prefetch open is shown as unverified and does not trigger immediate follow-up.
 4. AI proposes a recipient-local time window and explains the timing rationale; it does not send.
-5. A follow-up draft is visible in the review queue and cannot be sent until a human approves that exact version.
-6. Editing the approved draft or changing recipient/mailbox invalidates the approval.
+5. A follow-up inside an active plan authorization can be sent by the deterministic send worker only after the policy gate verifies recipient scope, endpoint health, cooldown, send limits, quality checks and suppression status.
+6. Changing plan scope, sending account, recipient categories or material sending limits invalidates the authorization and requires human re-approval.
 7. A reply pauses the contact's sequence and appears in the Conversation Hub.
 8. A hard bounce suppresses only the failed endpoint while retaining company/contact records.
 9. An unsubscribe/complaint blocks future sends according to suppression policy.
