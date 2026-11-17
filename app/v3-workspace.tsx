@@ -40,7 +40,29 @@ const zh:Record<string,string>={
  "Hide optional settings":"收起可选设置",
  "Draft only. Saving does not imply market research is complete or approve email sending.":"只保存开发意向；不代表已完成市场研究，也不代表授权发送邮件。",
  "Save research brief":"保存开发意向",
- "Verified product and market research must be completed first":"需要先完成产品和市场研究并核实结果"
+ "Verified product and market research must be completed first":"需要先完成产品和市场研究并核实结果",
+"Research access token":"研究访问令牌",
+ "Enter the workspace research access token":"输入工作台研究访问令牌",
+ "This token is held only in this page session and is not saved.":"令牌仅在当前页面会话中使用，不会保存。",
+ "Researching...":"研究中...",
+ "Research in progress":"正在研究",
+ "Searching product applications, market signals and relevant buyer segments.":"正在搜索产品应用、市场信号和匹配的买家群体。",
+ "Research could not be completed":"研究未能完成",
+ "Research report ready":"研究报告已生成",
+ "unique sources":"个独立来源",
+ "Clear report":"清除报告",
+ "Product applications":"产品应用场景",
+ "Market overview":"市场概况",
+ "Decision roles":"决策岗位",
+ "Evidence":"依据来源",
+ "Discovery keywords":"客户开发关键词",
+ "Assumptions and research gaps":"研究假设与信息缺口",
+ "Sources":"信息来源",
+ "Publication date unavailable":"发布日期未提供",
+ "confidence":"可信度",
+ "High":"高",
+ "Medium":"中",
+ "Low":"低"
 };
 const local=(t:T,k:string)=>t(k)===k?(typeof window!=="undefined"&&document.documentElement.lang==="zh-CN"?(zh[k]||k):k):t(k);
 const dateNow=()=>new Date().toISOString();
@@ -51,13 +73,17 @@ export function V3LaunchCenter({t}:{t:T}){
  const [plans,setPlans]=useState<Plan[]>(initialPlans);
  const [selected,setSelected]=useState<string>(initialPlans[0].id);
  const [edit,setEdit]=useState(false); const [advanced,setAdvanced]=useState(false); const [current,setCurrent]=useState<Plan>(initialPlans[0]);
- const [researchStatus,setResearchStatus]=useState<"idle"|"pending">("idle");
+ const [researchStatus,setResearchStatus]=useState<"idle"|"pending"|"done"|"error">("idle");
+ const [researchToken,setResearchToken]=useState("");
+ const [researchError,setResearchError]=useState("");
+ const [researchResult,setResearchResult]=useState<any>(null);
+ const runResearch=async()=>{setResearchStatus("pending");setResearchError("");setResearchResult(null);try{const r=await fetch("/api/v3/research",{method:"POST",headers:{"Content-Type":"application/json","x-research-access-token":researchToken},body:JSON.stringify({product:current.product,market:current.countries})});const data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||"Research failed");setResearchResult(data);setResearchStatus("done");}catch(e){setResearchError(e instanceof Error?e.message:"Research request failed");setResearchStatus("error");}};
  const [runs,setRuns]=useState<Run[]>([]);
  const [hydrated,setHydrated]=useState(false);
  useEffect(()=>{try{const x=window.localStorage.getItem("ai-v3-plan-drafts");if(x){const parsed=JSON.parse(x);if(Array.isArray(parsed)&&parsed.length)setPlans(parsed);}const y=window.localStorage.getItem("ai-v3-run-attempts");if(y){const parsed=JSON.parse(y);if(Array.isArray(parsed))setRuns(parsed);}}catch{}setHydrated(true);},[]);
  useEffect(()=>{if(hydrated){window.localStorage.setItem("ai-v3-plan-drafts",JSON.stringify(plans));window.localStorage.setItem("ai-v3-run-attempts",JSON.stringify(runs));}},[plans,runs,hydrated]);
  const chosen=plans.find(x=>x.id===selected)||plans[0];
- const editPlan=(p:Plan)=>{setCurrent({...p});setSelected(p.id);setAdvanced(false);setResearchStatus("idle");setEdit(true);};
+ const editPlan=(p:Plan)=>{setCurrent({...p});setSelected(p.id);setAdvanced(false);setResearchStatus("idle");setResearchError("");setResearchResult(null);setEdit(true);};
  const change=(key:keyof Plan,value:string|number)=>setCurrent(old=>({...old,[key]:value,scopeApproved:false,approvalTime:undefined,stage:"draft"}));
  const save=()=>{if(!current.product.trim()||!current.countries.trim())return;const next={...current,name:current.name.trim()||current.product.trim()+" · "+current.countries.trim(),updatedAt:dateNow()};setPlans(prev=>[...prev.filter(x=>x.id!==current.id),next]);setSelected(next.id);setEdit(false);};
  const revoke=()=>setPlans(prev=>prev.map(x=>x.id===chosen.id?{...x,scopeApproved:false,approvalTime:undefined,stage:"draft"}:x));
@@ -84,8 +110,20 @@ export function V3LaunchCenter({t}:{t:T}){
  <label>{l("Product or product link")} <span>*</span><input required value={current.product} placeholder={l("Example product input")} onChange={e=>change("product",e.target.value)}/></label>
  <label>{l("Target market or countries")} <span>*</span><input required value={current.countries} placeholder={l("Example market input")} onChange={e=>change("countries",e.target.value)}/></label>
  </div>
- <div className="v3-research-step"><div><strong>{l("AI product & market intelligence")}</strong><p>{l("Discover actual applications, regional demand, buyer segments, decision makers, competing solutions and search terms, with citations and confidence ratings.")}</p></div><button type="button" className="secondary-button" disabled={!current.product.trim()||!current.countries.trim()} onClick={()=>setResearchStatus("pending")}><Search size={16}/>{l("Research product and market")}</button></div>
- {researchStatus==="pending"&&<div className="v3-research-unavailable"><AlertTriangle size={18}/><div><strong>{l("Research queued for integration, not executed")}</strong><p>{l("No live search or AI model is connected yet. The system has not analyzed your market and has not identified real customers.")}</p></div></div>}
+ <label className="v3-access-token">{l("Research access token")}<input type="password" autoComplete="off" value={researchToken} onChange={e=>setResearchToken(e.target.value)} placeholder={l("Enter the workspace research access token")}/><small>{l("This token is held only in this page session and is not saved.")}</small></label>
+ <div className="v3-research-step"><div><strong>{l("AI product & market intelligence")}</strong><p>{l("Discover actual applications, regional demand, buyer segments, decision makers, competing solutions and search terms, with citations and confidence ratings.")}</p></div><button type="button" className="secondary-button" disabled={!current.product.trim()||!current.countries.trim()} onClick={runResearch} disabled={!current.product.trim()||!current.countries.trim()||!researchToken.trim()||researchStatus==="pending"}><Search size={16}/>{researchStatus==="pending"?l("Researching..."):l("Research product and market")}</button></div>
+ {researchStatus==="pending"&&<div className="v3-research-unavailable"><RefreshCw size={18}/><div><strong>{l("Research in progress")}</strong><p>{l("Searching product applications, market signals and relevant buyer segments.")}</p></div></div>}
+ {researchStatus==="error"&&<div className="v3-research-unavailable"><AlertTriangle size={18}/><div><strong>{l("Research could not be completed")}</strong><p>{researchError}</p></div></div>}
+ {researchStatus==="done"&&researchResult&&<div className="v3-live-report">
+ <div className="v3-live-report-head"><div><strong>{l("Research report ready")}</strong><small>{researchResult.uniqueSources} {l("unique sources")} · {new Date(researchResult.generatedAt).toLocaleString()}</small></div><button type="button" className="secondary-button compact" onClick={()=>{setResearchResult(null);setResearchStatus("idle");}}>{l("Clear report")}</button></div>
+ <h3>{researchResult.report?.productProfile?.normalizedName||current.product}</h3><p>{researchResult.report?.productProfile?.category}</p>
+ <h4>{l("Product applications")}</h4><ul>{(researchResult.report?.productProfile?.applications||[]).map((x:string,i:number)=><li key={i}>{x}</li>)}</ul>
+ <h4>{l("Market overview")}</h4><p>{researchResult.report?.marketProfile?.overview}</p>
+ <h4>{l("Recommended buyer segments")}</h4>{(researchResult.report?.buyerSegments||[]).map((x:any,i:number)=><div className="v3-buyer-segment" key={i}><div><strong>{i+1}. {x.name}</strong><span>{l(x.priority)} · {l(x.confidence)} {l("confidence")}</span></div><p>{x.whyFit}</p><small>{l("Decision roles")}: {(x.decisionRoles||[]).join(", ")}</small><small>{l("Evidence")}: {(x.evidence||[]).join(", ")}</small></div>)}
+ <h4>{l("Discovery keywords")}</h4><div className="v3-keyword-list">{(researchResult.report?.discoveryStrategy?.keywords||[]).map((x:string,i:number)=><span key={i}>{x}</span>)}</div>
+ <h4>{l("Assumptions and research gaps")}</h4><ul>{[...(researchResult.report?.assumptions||[]),...(researchResult.report?.gaps||[])].map((x:string,i:number)=><li key={i}>{x}</li>)}</ul>
+ <h4>{l("Sources")}</h4><ol>{(researchResult.sources||[]).map((x:any)=><li key={x.id}><a href={x.url} target="_blank" rel="noreferrer">{x.title}</a><small>{x.id} · {x.publishedDate||l("Publication date unavailable")}</small></li>)}</ol>
+ </div>}
  <div className="v3-research-output">
  <div className="v3-subheading">{l("Research report will include")}</div>
  {[
