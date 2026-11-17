@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -13,7 +14,7 @@ const safeUrl=(v:string)=>{try{const u=new URL(v);return u.protocol==="https:"||
 export async function POST(req:NextRequest){
  const gate=process.env.V3_RESEARCH_ACCESS_TOKEN;
  const supplied=req.headers.get("x-research-access-token")||"";
- if(!gate||supplied.length!==gate.length||!crypto.timingSafeEqual(Buffer.from(supplied),Buffer.from(gate))){
+ if(!gate||supplied.length!==gate.length||!timingSafeEqual(Buffer.from(supplied),Buffer.from(gate))){
   return NextResponse.json({ok:false,error:"Research service is not configured or access is denied."},{status:503});
  }
  const exaKey=process.env.EXA_API_KEY;
