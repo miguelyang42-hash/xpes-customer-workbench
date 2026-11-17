@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {V3LaunchCenter,V3MailGateway,V3ModelGateway,V3Nurturing} from "./v3-workspace";
 import {
   ArrowRight, ArrowUpRight, Bell, Bot, Building2, CheckCircle2, ChevronDown, ChevronRight,
   CircleAlert, ClipboardList, CircleHelp, Compass, Download, ExternalLink, Globe2, Inbox,
@@ -33,7 +34,8 @@ const navGroups = [
     { id: "overview", label: "Command Center", icon: Compass },
     { id: "plans", label: "Development Plans", icon: Target },
     { id: "customers", label: "Customer Database", icon: Building2 },
-    { id: "inbox", label: "Conversation Hub", icon: MessageCircle }
+    { id: "inbox", label: "Conversation Hub", icon: MessageCircle },
+    { id: "nurturing", label: "Customer Nurturing", icon: RefreshCw }
   ]},
   { label: "EXECUTION", items: [
     { id: "outreach", label: "Outreach Center", icon: Send },
@@ -59,6 +61,8 @@ const translations: Record<string, string> = {
   "Tasks & Audit": "任务与审计",
   "Model Connections": "AI 模型连接",
   "Settings": "系统设置",
+  "Customer Nurturing": "客户持续开发",
+  "Start development": "启动开发流程",
   "AI SALES WORKSPACE": "智能销售工作空间",
   "SALES DEVELOPMENT SYSTEM": "销售开发系统",
   "Global Sales Workspace": "全球销售工作空间",
@@ -480,15 +484,9 @@ export default function Home() {
               {selected && <CustomerDrawer customer={selected} onClose={()=>setSelected(null)} onCreateTask={()=>{openTaskModal(selected);setSelected(null);}} t={t}/>}
           </section>}
 
-          {active === "plans" && <section>
-            <div className="page-heading"><div><div className="eyebrow">{t("AUTONOMOUS WORKFLOWS")}</div><h1>{t("Development Plans")}</h1><p>{t("Define a market, product and buyer profile before execution.")}</p></div><button className="primary-button" onClick={()=>showNotice(t("Plan builder will be connected to the task engine in the next build stage."))}><Plus size={16}/> {t("New plan")}</button></div>
-            <div className="plan-grid">
-              <div className="plan-card featured-plan"><div className="plan-card-top"><span className="plan-icon"><Target size={18}/></span><span className="stage-tag stage-green">{t("Draft template")}</span></div><h3>{t("Solar Mosquito Killer · South America")}</h3><p>Find local brands, importers and outdoor pest-control distributors.</p><div className="plan-meta"><span><Globe2 size={14}/> Peru · Chile · Brazil</span><span><Users size={14}/> {t("Brand / distributor")}</span></div><div className="plan-bottom"><span>{t("Not started")}</span><button className="text-button" onClick={()=>showNotice("This is a planning template. No search has been started.")}>{t("Configure")} <ArrowRight size={14}/></button></div></div>
-              <div className="plan-card"><div className="plan-card-top"><span className="plan-icon"><Layers3 size={18}/></span><span className="stage-tag">{t("Draft template")}</span></div><h3>{t("185nm TOC Replacement Lamps")}</h3><p>Identify ultrapure-water system owners, service companies and replacement channels.</p><div className="plan-meta"><span><Globe2 size={14}/> North America · Taiwan · SEA</span><span><Users size={14}/> {t("Service / integrator")}</span></div><div className="plan-bottom"><span>Not started</span><button className="text-button" onClick={()=>showNotice("This is a planning template. No search has been started.")}>Configure <ArrowRight size={14}/></button></div></div>
-              <div className="plan-card"><div className="plan-card-top"><span className="plan-icon"><Zap size={18}/></span><span className="stage-tag">Draft template</span></div><h3>{t("Industrial UV Water Disinfection")}</h3><p>Find water-treatment engineering firms, OEM partners and project integrators.</p><div className="plan-meta"><span><Globe2 size={14}/> Global</span><span><Users size={14}/> {t("Engineering / OEM")}</span></div><div className="plan-bottom"><span>Not started</span><button className="text-button" onClick={()=>showNotice("This is a planning template. No search has been started.")}>Configure <ArrowRight size={14}/></button></div></div>
-            </div>
-          </section>}
-
+          {active === "plans" && <V3LaunchCenter t={t}/>}
+          {active === "nurturing" && <V3Nurturing t={t}/>}
+          
           {active === "inbox" && <section>
             <div className="page-heading"><div><div className="eyebrow">CUSTOMER RELATIONSHIPS</div><h1>{t("Conversation Hub")}</h1><p>{t("One place for customer replies, context and reviewed AI suggestions.")}</p></div><span className="stage-tag">{t("Demo conversations")}</span></div>
             <div className="conversation-layout"><div className="conversation-list"><div className="conversation-search"><Search size={15}/><span>{t("Search conversations")}</span></div>{customers.filter(c=>c.id===1||c.id===2).map((c,i)=><button key={c.id} className={"conversation-item "+(i===0?"conversation-active":"")} onClick={()=>setSelected(c)}><div className="conversation-avatar">{c.company[0]}</div><div className="conversation-preview"><div><strong>{c.company}</strong><time>{i===0?"10:42":"Yesterday"}</time></div><span>{i===0?"Could you recommend a UV system for our flow?":"Can you share specifications and MOQ?"}</span><small>{c.product}</small></div></button>)}</div>
@@ -498,15 +496,15 @@ export default function Home() {
 
           {active === "outreach" && <section><div className="page-heading"><div><div className="eyebrow">MULTI-CHANNEL ENGAGEMENT</div><h1>{t("Outreach Center")}</h1><p>{t("AI prepares context and copy; you control social-platform actions.")}</p></div></div><div className="channel-grid">{[{name:"LinkedIn",desc:"Open verified company or contact profile",icon:"in"},{name:"WhatsApp",desc:"Open an existing business conversation",icon:"wa"},{name:"Instagram",desc:"Review brand profile and prepare a message",icon:"ig"},{name:"Facebook",desc:"Open company page and prepare outreach",icon:"fb"}].map(c=><div className="channel-card" key={c.name}><div className="channel-logo">{c.icon}</div><div><h3>{c.name}</h3><p>{t(c.desc)}</p><span className="stage-tag">{t("Manual action")}</span></div><button className="ghost-button" onClick={()=>showNotice("Customer-specific links will appear after contact profiles are verified.")}>{t("Open")} <ExternalLink size={14}/></button></div>)}</div><div className="notice-card"><ShieldCheck size={19}/><div><strong>{t("Human-controlled social outreach")}</strong><p>{t("V1.0 will not automate scraping or bulk messaging on social platforms. It will prepare verified links and drafts, record your confirmation separately from platform-verified delivery.")}</p></div></div></section>}
 
-          {active === "mail" && <section><div className="page-heading"><div><div className="eyebrow">EMAIL OPERATIONS</div><h1>{t("AI Mail Manager")}</h1><p>{t("Separate AI prospecting mail from your everyday business inbox.")}</p></div><span className="stage-tag">{t("Mailbox not connected")}</span></div><div className="mail-tabs">{["All","Sent","Replies","Bounces","Unsubscribed","Auto-replies","Priority"].map(tab=><button key={tab} className={mailTab===tab?"mail-tab active-mail-tab":"mail-tab"} onClick={()=>setMailTab(tab)}>{t(tab)}</button>)}</div><div className="mail-empty"><div className="empty-icon"><Inbox size={25}/></div><h3>{mailTab==="All"?"Your AI mail workspace is ready":mailTab+" folder"}</h3><p>Connect Gmail or Tencent Enterprise Mail to synchronize real messages, delivery events and replies. Nothing will be moved or sent before you approve the connection and rules.</p><button className="secondary-button" onClick={()=>showNotice("Mailbox connection is scheduled for the integration stage. No account has been accessed.")}>View connection requirements <ArrowRight size={15}/></button></div></section>}
-
+          {active === "mail" && <V3MailGateway t={t}/>}
+          
           {active === "tasks" && <TaskCenter tasks={tasks} onCreate={()=>openTaskModal(null)} onComplete={completeTask} t={t}/>}
 
-          {active === "models" && <section><div className="page-heading"><div><div className="eyebrow">MODEL-AGNOSTIC ARCHITECTURE</div><h1>{t("Model Connections")}</h1><p>{t("Choose providers independently of the business workflow.")}</p></div><button className="primary-button" onClick={()=>showNotice("Model connection setup will request your provider endpoint and API key through encrypted settings. Do not paste keys into chat.")}><Plus size={16}/> Add provider</button></div><div className="model-grid">{[{name:"OpenAI-compatible API",desc:"Custom endpoint · model name · encrypted key",tag:"Provider adapter"},{name:"DeepSeek",desc:"Optional model provider",tag:"Provider adapter"},{name:"Google Gemini",desc:"Optional model provider",tag:"Provider adapter"},{name:"Anthropic Claude",desc:"Optional model provider",tag:"Provider adapter"}].map(m=><div className="model-card" key={m.name}><div className="model-symbol"><Bot size={20}/></div><div><h3>{m.name}</h3><p>{m.desc}</p><span className="stage-tag">{m.tag}</span></div><button className="secondary-button compact" onClick={()=>showNotice("No model provider is connected yet.")}>Configure</button></div>)}</div><div className="notice-card"><ShieldCheck size={19}/><div><strong>{t("Credential safety")}</strong><p>{t("API keys will be stored server-side as encrypted secrets. They will never be exposed in browser code or chat messages.")}</p></div></div></section>}
-
+          {active === "models" && <V3ModelGateway t={t}/>}
+          
           {active === "settings" && <section><div className="page-heading"><div><div className="eyebrow">WORKSPACE CONTROL</div><h1>{t("Settings")}</h1><p>{t("Workspace identity, permissions, data and safety rules.")}</p></div></div><div className="settings-list">{[{title:"Workspace",desc:"AI Sales Workspace · Independent environment"},{title:"Data ownership",desc:"Exportable customer records, task history and audit trail"},{title:"Safety policy",desc:"No unverified contact auto-send; no false completion states"},{title:"Integrations",desc:"Gmail, Tencent Mail, model providers and search services"},{title:"Backup & recovery",desc:"Automated database backups and restore drills"}].map(x=><div className="settings-row" key={x.title}><div><strong>{t(x.title)}</strong><span>{t(x.desc)}</span></div><ChevronRight size={17}/></div>)}</div></section>}
         </div>
-        <footer className="footer"><span>AI Sales Workspace · {t("Independent V1.0 build")}</span><span>{t("Preview environment · No live customer actions")}</span></footer>
+        <footer className="footer"><span>AI Sales Workspace · V3 Design Preview</span><span>{t("Preview environment · No live customer actions")}</span></footer>
       </section>
       {customerModal && <CustomerForm onClose={()=>setCustomerModal(false)} onSave={saveCustomer} t={t}/>}
       {taskModal && <TaskForm customers={allCustomers} initialCustomer={taskCustomer} onClose={()=>{setTaskModal(false);setTaskCustomer(null);}} onSave={saveTask} t={t}/>}
@@ -517,7 +515,7 @@ export default function Home() {
 
 function Overview({ onNavigate, onNotice, t, tasks, customersCount, onCreateTask, onCompleteTask }: { onNavigate: (id:string)=>void; onNotice: (message:string)=>void; t: (value:string)=>string; tasks: FollowUpTask[]; customersCount:number; onCreateTask:()=>void; onCompleteTask:(id:string)=>void }) {
   return <section>
-    <div className="welcome-row"><div><div className="eyebrow">{t("SATURDAY · NOVEMBER 14, 2026")}</div><h1>{t("Good morning")}</h1><p>{t("Your sales development command center is ready.")}</p></div><button className="primary-button" onClick={()=>onNavigate("plans")}><Plus size={16}/> {t("Create development plan")}</button></div>
+    <div className="welcome-row"><div><div className="eyebrow">V3 · PREVIEW WORKSPACE</div><h1>{t("Good morning")}</h1><p>{t("Your sales development command center is ready.")}</p></div><div className="v3-home-actions"><button className="secondary-button" onClick={()=>onNavigate("customers")}><Users size={16}/> {t("Customer Database")}</button><button className="primary-button" onClick={()=>onNavigate("plans")}><Zap size={17}/>{t("Start development")}</button></div></div>
     <div className="preview-banner"><div className="preview-icon"><Sparkles size={18}/></div><div><strong>{t("Independent workspace initialized")}</strong><p>{t("This is the first UI build. Demo records are clearly marked; real database, AI models and mailboxes are not connected yet.")}</p></div><span className="preview-status">{t("PREVIEW")}</span></div>
     <div className="section-title"><div><h2>{t("Business pulse")}</h2><p>{t("Production metrics will appear after verified data is connected.")}</p></div><button className="ghost-button" onClick={()=>onNotice(t("These are placeholders, not live operating figures."))}>{t("Why no live metrics?")}</button></div>
     <div className="metric-grid">
