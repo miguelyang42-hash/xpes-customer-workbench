@@ -100,7 +100,7 @@ export function V3LaunchCenter({t}:{t:T}){
  ["name","Plan name","text"],["buyers","Buyer profile","text"],["goal","Verified customer target","number"],["candidateCap","Maximum search candidates","number"],["dailyLimit","Daily email limit","number"],["weeklyLimit","Weekly email limit","number"],["maxTouches","Maximum touches per contact","number"],["startHour","Local sending window","time"],["endHour","Local sending window","time"]
  ] as const).map(([key,label,type])=><label key={key}>{l(label)}<input type={type} min={type==="number"?"1":undefined} value={current[key]} onChange={e=>change(key,type==="number"?Math.max(1,Number(e.target.value)):e.target.value)} /></label>)}</div>}
  <div className="modal-foot"><span>{l("Draft only. Saving does not imply market research is complete or approve email sending.")}</span><div><button className="secondary-button" onClick={()=>setEdit(false)}>{l("Cancel")}</button><button className="primary-button" disabled={!current.product.trim()||!current.countries.trim()} onClick={save}>{l("Save research brief")}</button></div></div>
- </div></div>
+ </div></div>}
  </section>;
 }
 
