@@ -39,7 +39,8 @@ const zh:Record<string,string>={
  "Optional: adjust development limits":"可选：展开开发限制设置",
  "Hide optional settings":"收起可选设置",
  "Draft only. Saving does not imply market research is complete or approve email sending.":"只保存开发意向；不代表已完成市场研究，也不代表授权发送邮件。",
- "Save research brief":"保存开发意向"
+ "Save research brief":"保存开发意向",
+ "Verified product and market research must be completed first":"需要先完成产品和市场研究并核实结果"
 };
 const local=(t:T,k:string)=>t(k)===k?(typeof window!=="undefined"&&document.documentElement.lang==="zh-CN"?(zh[k]||k):k):t(k);
 const dateNow=()=>new Date().toISOString();
@@ -59,7 +60,6 @@ export function V3LaunchCenter({t}:{t:T}){
  const editPlan=(p:Plan)=>{setCurrent({...p});setSelected(p.id);setAdvanced(false);setResearchStatus("idle");setEdit(true);};
  const change=(key:keyof Plan,value:string|number)=>setCurrent(old=>({...old,[key]:value,scopeApproved:false,approvalTime:undefined,stage:"draft"}));
  const save=()=>{if(!current.product.trim()||!current.countries.trim())return;const next={...current,name:current.name.trim()||current.product.trim()+" · "+current.countries.trim(),updatedAt:dateNow()};setPlans(prev=>[...prev.filter(x=>x.id!==current.id),next]);setSelected(next.id);setEdit(false);};
- const authorize=()=>{if(!chosen)return;setPlans(prev=>prev.map(x=>x.id===chosen.id?{...x,scopeApproved:true,approvalTime:dateNow(),stage:"authorized"}:x));};
  const revoke=()=>setPlans(prev=>prev.map(x=>x.id===chosen.id?{...x,scopeApproved:false,approvalTime:undefined,stage:"draft"}:x));
  const blocked=()=>{if(!chosen)return;setRuns(prev=>[{id:"LOCAL-"+Date.now(),planId:chosen.id,createdAt:dateNow(),status:"blocked",reason:"No cloud database, execution workers, research connector or sending mailbox"},...prev]);};
  return <section className="v3-wrap">
@@ -71,7 +71,7 @@ export function V3LaunchCenter({t}:{t:T}){
  <div className="v3-panel-top"><div><div className="eyebrow">{l("Development plan")}</div><h2>{chosen.name}</h2><p>{chosen.product} · {chosen.buyers}</p></div><button className="secondary-button compact" onClick={()=>editPlan(chosen)}>{l("Edit")}</button></div>
  <div className="v3-stats"><div><span>{l("Verified customer target")}</span><strong>{chosen.goal}</strong></div><div><span>{l("Maximum search candidates")}</span><strong>{chosen.candidateCap}</strong></div><div><span>{l("Daily email limit")}</span><strong>{chosen.dailyLimit}</strong></div><div><span>{l("Maximum touches per contact")}</span><strong>{chosen.maxTouches}</strong></div></div>
  <div className="v3-config"><span>{l("Target countries")}: <strong>{chosen.countries}</strong></span><span>{l("Local sending window")}: <strong>{chosen.startHour}–{chosen.endHour}</strong></span><span>{l("Sending account")}: <strong>{chosen.mailbox||l("No mailboxes connected")}</strong></span></div>
- <div className="v3-authorization"><div><h3>{l("Plan authorization")}</h3><p>{l("Approval does not connect accounts or authorize production sending.")}</p></div>{chosen.scopeApproved?<button className="secondary-button" onClick={revoke}>{l("Revoke authorization")}</button>:<button className="secondary-button" onClick={authorize}><ShieldCheck size={16}/>{l("Approve plan policy")}</button>}</div>
+ <div className="v3-authorization"><div><h3>{l("Plan authorization")}</h3><p>{l("Approval does not connect accounts or authorize production sending.")}</p></div>{chosen.scopeApproved?<button className="secondary-button" onClick={revoke}>{l("Revoke authorization")}</button>:<button className="secondary-button" disabled title={l("Verified product and market research must be completed first")}><ShieldCheck size={16}/>{l("Approve plan policy")}</button>}</div>
  <div className="v3-preflight"><h3>{l("Launch readiness")}</h3>{[
  [l("Independent database"),false],[l("Execution workers"),false],[l("Search and verification provider"),false],[l("Connected sending mailbox"),false],[l("Policy and suppression checks"),false],
  ].map(([label,ready],i)=><div className="v3-check" key={i}><span>{ready?<CheckCircle2 size={16}/>:<AlertTriangle size={16}/>} {label}</span><small>{l("Not connected")}</small></div>)}
