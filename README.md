@@ -45,18 +45,26 @@ A neutral, model-agnostic workspace for customer development and follow-up opera
 ## Current preview limitations
 - New customer and task entries are currently saved only in this browser's local storage.
 - Demo customer rows are illustrative and are not real leads.
-- Cloud database, authentication, team permissions, AI providers, mailboxes and messaging channels are not connected yet.
+- Cloud database, authentication, team permissions, AI providers, mailboxes and messaging channels are not connected yet. V3 allows local draft configuration only and cannot execute external tasks.
 - Do not use browser-local preview data as the sole business record.
 - No real outreach is sent from this preview.
 
 ## Planned architecture
 - Next.js frontend
-- PostgreSQL/Supabase backend with authenticated workspace membership and RLS
+- Independent PostgreSQL database on the user's Tencent Cloud environment, with authenticated workspace membership and row-level authorization enforced at the API/DB layers
 - Persistent task queue and independent workers
 - Provider-neutral AI adapter
-- Gmail API and Tencent Enterprise Mail connectors
+- Gmail and Tencent Enterprise Mail via capability-tested MCP/API/OAuth/SMTP/IMAP adapters
 - Official WhatsApp Business API / eligible coexistence accounts; personal WhatsApp remains manual-assist unless an official supported path becomes available
 - Evidence ledger, idempotency, suppression list and retry/reconciliation rules
+
+## V3 implemented in the development preview
+
+- `app/v3-workspace.tsx`: multi-plan UI, local plan configuration, plan-level authorization-intent preview, honest blocked-run records, mail account metadata drafts, single AI provider metadata drafts, and nurturing sequence overview.
+- `lib/v3-send-policy.ts`: pure fail-closed send authorization checks, independent task evidence helpers and engagement-event taxonomy. **Not wired to a production worker or email provider.**
+- `db/v3_tencent_postgres_schema.sql`: isolated PostgreSQL design artifact for Tencent Cloud deployment. **Not executed on any database.**
+- V3 front-end preview cannot send messages, initiate web research, contact clients or mutate the existing CRM.
+- Local browser records are not backed up or shared across devices.
 
 ## Local development
 - npm install
