@@ -40,7 +40,7 @@ Marking a reminder complete is a manual user action only. It does not mean an em
 The approved next product-design module is a dedicated Customer Nurturing Center. It manages the initial outreach plus follow-ups 2–4 and, when separately authorized, a bounded long-term nurture plan.
 
 Confirmed user decisions:
-- Every follow-up message requires human review and explicit approval before sending.
+- Routine email touches are automatically sent only within a user-approved and versioned plan; individual approval is no longer required.
 - AI recommends recipient-local timing using local working hours, engagement-event confidence and the contact's interaction history.
 - AI may create drafts and reminders, but it does not autonomously send follow-ups.
 - Open tracking is not proof of a human read; proxy/prefetch events are marked unverified.
