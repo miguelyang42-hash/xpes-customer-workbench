@@ -308,7 +308,6 @@ const translations: Record<string, string> = {
   "Company type": "公司类型",
   "Contact name": "联系人姓名",
   "Job title": "职位",
-  "Email": "邮箱",
   "Source URL": "信息来源链接",
   "Notes": "备注",
   "Save customer": "保存客户",
