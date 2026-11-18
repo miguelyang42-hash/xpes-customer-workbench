@@ -344,7 +344,23 @@ const translations: Record<string, string> = {
   "Next action": "下一步行动",
   "Verify company and contact": "核实公司和联系人",
   "A new customer record. Verify the company and contact before outreach.": "新建客户档案。触达前请核实公司和联系人。",
-  "This is a manual reminder. It does not send a message or claim external work was completed.": "这是人工跟进提醒，不会发送消息，也不会声称外部工作已完成。"
+  "This is a manual reminder. It does not send a message or claim external work was completed.": "这是人工跟进提醒，不会发送消息，也不会声称外部工作已完成。",
+  "Integration services": "集成服务",
+  "Authorize email, social and research accounts for this workspace.": "为此工作空间授权邮箱、社媒和研究账号。",
+  "Email": "邮箱",
+  "Social media": "社交媒体",
+  "Research services": "研究服务",
+  "Not connected": "未连接",
+  "Connect account": "连接账号",
+  "OAuth setup is not configured for this service yet. No account was authorized.": "此服务尚未配置 OAuth 授权，当前没有账号连接成功。",
+  "Google / Gmail": "Google / Gmail",
+  "Microsoft 365": "Microsoft 365",
+  "Tencent Enterprise Mail": "腾讯企业邮箱",
+  "LinkedIn": "LinkedIn",
+  "Instagram / Facebook": "Instagram / Facebook",
+  "WhatsApp Business": "WhatsApp Business",
+  "Web research": "网页研究",
+  "Account authorization and granted permissions will be shown here after OAuth is configured.": "配置 OAuth 后，这里会显示已授权账号和授予的权限。"
 };
 type Language = "en" | "zh";
 
@@ -502,7 +518,7 @@ export default function Home() {
 
           {active === "models" && <V3ModelGateway t={t}/>}
           
-          {active === "settings" && <section><div className="page-heading"><div><div className="eyebrow">WORKSPACE CONTROL</div><h1>{t("Settings")}</h1><p>{t("Workspace identity, permissions, data and safety rules.")}</p></div></div><div className="settings-list">{[{title:"Workspace",desc:"AI Sales Workspace · Independent environment"},{title:"Data ownership",desc:"Exportable customer records, task history and audit trail"},{title:"Safety policy",desc:"No unverified contact auto-send; no false completion states"},{title:"Integrations",desc:"Gmail, Tencent Mail, model providers and search services"},{title:"Backup & recovery",desc:"Automated database backups and restore drills"}].map(x=><div className="settings-row" key={x.title}><div><strong>{t(x.title)}</strong><span>{t(x.desc)}</span></div><ChevronRight size={17}/></div>)}</div></section>}
+          {active === "settings" && <section><div className="page-heading"><div><div className="eyebrow">WORKSPACE CONTROL</div><h1>{t("Settings")}</h1><p>{t("Workspace identity, permissions, data and safety rules.")}</p></div></div><div className="settings-list">{[{title:"Workspace",desc:"AI Sales Workspace · Independent environment"},{title:"Data ownership",desc:"Exportable customer records, task history and audit trail"},{title:"Safety policy",desc:"No unverified contact auto-send; no false completion states"},{title:"Integrations",desc:"Gmail, Tencent Mail, model providers and search services"},{title:"Backup & recovery",desc:"Automated database backups and restore drills"}].map(x=><div className="settings-row" key={x.title}><div><strong>{t(x.title)}</strong><span>{t(x.desc)}</span></div><ChevronRight size={17}/></div>)}</div><div style={{marginTop:24,background:"#fff",border:"1px solid #dfe6ee",borderRadius:14,padding:22}}><div style={{marginBottom:18}}><h2 style={{margin:"0 0 6px",fontSize:20}}>{t("Integration services")}</h2><p style={{margin:0,color:"#718096",fontSize:14}}>{t("Authorize email, social and research accounts for this workspace.")}</p></div>{[{group:"Email",items:["Google / Gmail","Microsoft 365","Tencent Enterprise Mail"]},{group:"Social media",items:["LinkedIn","Instagram / Facebook","WhatsApp Business"]},{group:"Research services",items:["Web research"]}].map(group=><div key={group.group} style={{marginTop:20}}><h3 style={{fontSize:14,color:"#53677e",margin:"0 0 10px"}}>{t(group.group)}</h3><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",gap:10}}>{group.items.map(name=><div key={name} style={{border:"1px solid #e5eaf0",borderRadius:10,padding:14,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}><div><strong style={{display:"block",fontSize:14}}>{t(name)}</strong><span style={{display:"inline-block",marginTop:6,fontSize:12,color:"#9a6b18",background:"#fff7e6",padding:"3px 8px",borderRadius:999}}>{t("Not connected")}</span></div><button className="ghost-button" onClick={()=>showNotice(t("OAuth setup is not configured for this service yet. No account was authorized."))}>{t("Connect account")}</button></div>)}</div></div>)}<p style={{margin:"18px 0 0",fontSize:12,color:"#8795a5"}}>{t("Account authorization and granted permissions will be shown here after OAuth is configured.")}</p></div></section>}
         </div>
         <footer className="footer"><span>AI Sales Workspace · V3 Design Preview</span><span>{t("Preview environment · No live customer actions")}</span></footer>
       </section>
